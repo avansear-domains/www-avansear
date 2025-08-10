@@ -119,7 +119,7 @@ export function Navbar() {
           className="flex flex-row items-center justify-between relative px-0 pb-0 fade md:overflow-auto scroll-pr-6 md:relative"
           id="nav"
         >
-          <div className="flex flex-row items-center space-x-0">
+          <div className="flex flex-row items-center space-x-2">
             {Object.entries(navItems).map(([path, { name }]) => {
               return (
                 <InternalHoverButton key={path} href={path}>
