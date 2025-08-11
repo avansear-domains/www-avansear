@@ -19,5 +19,11 @@ export function getArchivedSongs(): ArchivedSong[] {
       artist: "girl in red",
       youtubeId: "Ra9KtiCMynE"
     },
+    {
+      week: "Week 3",
+      songName: "better",
+      artist: "regina spektor",
+      youtubeId: "eAR2iHYNIe4"
+    }
   ]
 }
