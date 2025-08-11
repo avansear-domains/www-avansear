@@ -87,13 +87,13 @@ export function Navbar() {
 
   if (!mounted) {
     return (
-      <aside className="-ml-[8px] mb-10 sm:mb-16 tracking-tight">
-        <div className="lg:sticky lg:top-20">
-          <nav
-            className="flex flex-row items-center justify-between relative px-2 pb-2 fade md:overflow-visible scroll-pr-6 md:relative"
-            id="nav"
-          >
-            <div className="flex flex-row items-center space-x-1">
+      <aside className="-ml-[8px] mb-10 sm:mb-16 tracking-tight overflow-visible">
+        <div className="lg:sticky lg:top-20 overflow-visible">
+                      <nav
+              className="flex flex-row items-center justify-between relative px-0 pb-0 fade overflow-visible md:relative"
+              id="nav"
+            >
+              <div className="flex flex-row items-center overflow-visible space-x-2">
               {Object.entries(navItems).map(([path, { name }]) => {
                 return (
                   <InternalHoverButton key={path} href={path}>
@@ -113,13 +113,13 @@ export function Navbar() {
   }
 
   return (
-    <aside className="-ml-[8px] mb-10 sm:mb-16 tracking-tight">
-      <div className="lg:sticky lg:top-20">
+    <aside className="-ml-[8px] mb-10 sm:mb-16 tracking-tight overflow-visible">
+      <div className="lg:sticky lg:top-20 overflow-visible">
         <nav
-          className="flex flex-row items-center justify-between relative px-2 pb-2 fade md:overflow-visible scroll-pr-6 md:relative"
+          className="flex flex-row items-center justify-between relative px-0 pb-0 fade overflow-visible md:relative"
           id="nav"
         >
-          <div className="flex flex-row items-center space-x-1">
+          <div className="flex flex-row items-center overflow-visible space-x-2">
             {Object.entries(navItems).map(([path, { name }]) => {
               return (
                 <InternalHoverButton key={path} href={path}>

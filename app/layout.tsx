@@ -74,7 +74,7 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="antialiased max-w-xl mx-6 mt-8 sm:mx-auto">
+      <body className="antialiased max-w-xl mx-4 mt-8 sm:mx-auto">
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -104,7 +104,7 @@ export default function RootLayout({
           }}
         />
         <CustomCursor />
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-2">
+        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
           <Navbar />
           {children}
           <Footer />
