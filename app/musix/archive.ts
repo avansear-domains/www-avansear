@@ -24,6 +24,12 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "better",
       artist: "regina spektor",
       youtubeId: "eAR2iHYNIe4"
+    },
+    {
+      week: "Week 4",
+      songName: "why this kolaveri di?",
+      artist: "dhanush",
+      youtubeId: "geIAO3PrE2g"
     }
   ]
 }
