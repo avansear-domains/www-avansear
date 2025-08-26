@@ -30,6 +30,12 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "why this kolaveri di?",
       artist: "dhanush",
       youtubeId: "geIAO3PrE2g"
+    },
+    {
+      week: "Week 5",
+      songName: "motels",
+      artist: "royel otis",
+      youtubeId: "J3Lks5GVQs"
     }
   ]
 }
