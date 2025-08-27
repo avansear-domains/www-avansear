@@ -10,5 +10,6 @@
     --color-dark: #0F0F0E;
     --color-light: #DBD2D2;
     --color-light-80: #DBD2D2BF;
+    user-select: none;
   }
 }
