@@ -66,6 +66,12 @@ export default function RootLayout({
       )}
     >
       <head>
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="avan's blog"
+          href="/rss"
+        />
         {process.env.RYBBIT_SITE_ID && (
           <script
             src="https://app.rybbit.io/api/script.js"
