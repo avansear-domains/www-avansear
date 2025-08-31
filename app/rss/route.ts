@@ -20,16 +20,18 @@ export async function GET() {
           <pubDate>${new Date(
             post.metadata.publishedAt
           ).toUTCString()}</pubDate>
+          <guid>${baseUrl}/blog/${post.slug}</guid>
         </item>`
     )
     .join('\n')
 
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
-  <rss version="2.0">
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>My Portfolio</title>
         <link>${baseUrl}</link>
         <description>This is my portfolio RSS feed</description>
+        <atom:link href="${baseUrl}/rss" rel="self" type="application/rss+xml" />
         ${itemsXml}
     </channel>
   </rss>`
