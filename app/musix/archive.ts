@@ -36,6 +36,21 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "motels",
       artist: "royel otis",
       youtubeId: "_J3Lks5GVQs"
+    },
+    {
+      week: "Week 6",
+      songName: "bloom",
+      artist: "the paper kites",
+      youtubeId: "Cyx2CWBVfDE"
     }
   ]
 }
+
+/*
+    {
+      week: "Week",
+      songName: "",
+      artist: "",
+      youtubeId: ""
+    }
+*/
