@@ -29,13 +29,12 @@ export async function GET() {
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>Avan's Blog</title>
+        <title>avan's blog</title>
         <link>${baseUrl}</link>
-        <description>Personal blog posts by Avan</description>
+        <description>random stories by avan :D</description>
         <language>en-US</language>
-        <managingEditor>avan@avansear.com (Avan)</managingEditor>
-        <webMaster>avan@avansear.com (Avan)</webMaster>
-        <generator>Next.js RSS Feed</generator>
+        <managingEditor>me@avansear.com (avan)</managingEditor>
+        <webMaster>me@avansear.com (avan)</webMaster>
         <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
         <atom:link href="${baseUrl}/rss" rel="self" type="application/rss+xml" />
         ${itemsXml}
