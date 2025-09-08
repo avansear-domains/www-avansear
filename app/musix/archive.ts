@@ -42,6 +42,12 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "bloom",
       artist: "the paper kites",
       youtubeId: "Cyx2CWBVfDE"
+    },
+    {
+      week: "Week 7",
+      songName: "brazil",
+      artist: "declan mckenna",
+      youtubeId: "sSUecTSYulM"
     }
   ]
 }
