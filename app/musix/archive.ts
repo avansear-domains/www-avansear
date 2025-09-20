@@ -48,6 +48,12 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "brazil",
       artist: "declan mckenna",
       youtubeId: "sSUecTSYulM"
+    },
+    {
+      week: "Week 8",
+      songName: "memoria (burnt edit)",
+      artist: "philip mchale",
+      youtubeId: "RREc6aKHk"
     }
   ]
 }
