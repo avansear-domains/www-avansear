@@ -66,8 +66,8 @@ export function Navbar() {
     { 
       id: 'theme1', 
       name: 'Theme 1', 
-      bgColor: '#040432', 
-      borderColor: '#ff001e' 
+      bgColor: '#0e000e', 
+      borderColor: '#ef9090' 
     },
     { 
       id: 'theme2', 
