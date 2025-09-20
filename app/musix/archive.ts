@@ -53,7 +53,7 @@ export function getArchivedSongs(): ArchivedSong[] {
       week: "Week 8",
       songName: "memoria (burnt edit)",
       artist: "philip mchale",
-      youtubeId: "RREc6aKHk"
+      youtubeId: "RREc6aKHk-M"
     }
   ]
 }
