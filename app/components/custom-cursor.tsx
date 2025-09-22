@@ -2,6 +2,7 @@
 
 import { motion } from 'motion/react'
 import { useState, useEffect, useCallback } from 'react'
+import { useCursor } from './cursor-context'
 
 function ArrowIcon() {
   return (
@@ -21,6 +22,7 @@ function ArrowIcon() {
 }
 
 export function CustomCursor() {
+  const { isCursorEnabled } = useCursor()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isVisible, setIsVisible] = useState(true) // Start visible for Safari
   const [isHovering, setIsHovering] = useState(false)
@@ -192,8 +194,8 @@ export function CustomCursor() {
   const offsetX = isHovering ? 6 : 4
   const offsetY = isHovering ? 6 : 4
 
-  // Don't render until mounted (helps with Safari) or on mobile/small screens
-  if (!isMounted || !isDesktop) {
+  // Don't render until mounted (helps with Safari) or on mobile/small screens or when disabled
+  if (!isMounted || !isDesktop || !isCursorEnabled) {
     return null
   }
 

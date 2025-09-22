@@ -9,6 +9,8 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Footer from './components/footer'
 import { CustomCursor } from './components/custom-cursor'
+import { CursorProvider } from './components/cursor-context'
+import { CursorHint } from './components/cursor-hint'
 import { baseUrl } from './sitemap'
 
 export const metadata: Metadata = {
@@ -109,14 +111,17 @@ export default function RootLayout({
             `,
           }}
         />
-        <CustomCursor />
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
-          <Navbar />
-          {children}
-          <Footer />
-          <Analytics />
-          <SpeedInsights />
-        </main>
+        <CursorProvider>
+          <CustomCursor />
+          <CursorHint />
+          <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+            <Navbar />
+            {children}
+            <Footer />
+            <Analytics />
+            <SpeedInsights />
+          </main>
+        </CursorProvider>
       </body>
     </html>
   )
