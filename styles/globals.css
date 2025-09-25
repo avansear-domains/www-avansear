@@ -7,7 +7,7 @@
 
 @layer base {
   html {
-    --color-dark: #CB582A;
+    --color-dark: #a53b10;
     --color-light: #EEE2C0;
     --color-light-80: #EEE2C0BF;
     user-select: none;

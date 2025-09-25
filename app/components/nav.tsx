@@ -60,7 +60,7 @@ export function Navbar() {
     { 
       id: '', 
       name: 'Default', 
-      bgColor: '#CB582A', 
+      bgColor: '#a53b10', 
       borderColor: '#EEE2C0' 
     },
     { 
