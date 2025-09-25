@@ -56,7 +56,7 @@ export function getArchivedSongs(): ArchivedSong[] {
       youtubeId: "RREc6aKHk-M"
     },
     {
-      week: "Week9 ",
+      week: "Week 9",
       songName: "anything",
       artist: "adrianne lenker",
       youtubeId: "pftT6MhrtLE"
