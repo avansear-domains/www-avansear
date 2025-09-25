@@ -66,26 +66,26 @@ export function Navbar() {
     { 
       id: 'theme1', 
       name: 'Theme 1', 
-      bgColor: '#0e000e', 
-      borderColor: '#ef9090' 
+      bgColor: '#9E2B25', 
+      borderColor: '#FFF8F0' 
     },
     { 
       id: 'theme2', 
       name: 'Theme 2', 
-      bgColor: '#78BC61', 
-      borderColor: '#131200' 
-    },
-    { 
-      id: 'theme3', 
-      name: 'Theme 3', 
       bgColor: '#f6d52e', 
       borderColor: '#1b0101' 
     },
     { 
+      id: 'theme3', 
+      name: 'Theme 3', 
+      bgColor: '#01160B', 
+      borderColor: '#E4572E' 
+    },
+    { 
       id: 'theme4', 
       name: 'Theme 4', 
-      bgColor: '#9E2B25', 
-      borderColor: '#FFF8F0' 
+      bgColor: '#0e000e', 
+      borderColor: '#ef9090'
     }
   ]
 

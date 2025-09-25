@@ -1,5 +1,5 @@
-html[data-theme="theme1"] {
-    --color-dark: #0e000e;
-    --color-light: #ef9090;
-    --color-light-80: #ef9090BF;
+html[data-theme="theme4"] {
+    --color-dark: #9E2B25;
+    --color-light: #FFF8F0;
+    --color-light-80: #FFF8F0BF;
 }
