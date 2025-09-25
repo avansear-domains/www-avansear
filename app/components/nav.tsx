@@ -60,8 +60,8 @@ export function Navbar() {
     { 
       id: '', 
       name: 'Default', 
-      bgColor: '#0F0F0E', 
-      borderColor: '#DBD2D2' 
+      bgColor: '#CB582A', 
+      borderColor: '#EEE2C0' 
     },
     { 
       id: 'theme1', 

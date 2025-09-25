@@ -7,9 +7,9 @@
 
 @layer base {
   html {
-    --color-dark: #DD6E42;
-    --color-light: #E8DAB2;
-    --color-light-80: #E8DAB2BF;
+    --color-dark: #CB582A;
+    --color-light: #EEE2C0;
+    --color-light-80: #EEE2C0BF;
     user-select: none;
   }
 }
