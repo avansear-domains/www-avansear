@@ -54,6 +54,12 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "memoria (burnt edit)",
       artist: "philip mchale",
       youtubeId: "RREc6aKHk-M"
+    },
+    {
+      week: "Week9 ",
+      songName: "anything",
+      artist: "adrianne lenker",
+      youtubeId: "pftT6MhrtLE"
     }
   ]
 }
