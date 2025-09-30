@@ -8,58 +8,64 @@ export interface ArchivedSong {
 export function getArchivedSongs(): ArchivedSong[] {
   return [
     {
-      week: "Week 1",
-      songName: "Kilby Girl",
-      artist: "The Backseat Lovers",
+      week: "week 1",
+      songName: "kilby girl",
+      artist: "the backseat lovers",
       youtubeId: "oTwVce9eWb4"
     },
     {
-      week: "Week 2",
+      week: "week 2",
       songName: "dead girl in the pool.",
       artist: "girl in red",
       youtubeId: "Ra9KtiCMynE"
     },
     {
-      week: "Week 3",
+      week: "week 3",
       songName: "better",
       artist: "regina spektor",
       youtubeId: "eAR2iHYNIe4"
     },
     {
-      week: "Week 4",
+      week: "week 4",
       songName: "why this kolaveri di?",
       artist: "dhanush",
       youtubeId: "geIAO3PrE2g"
     },
     {
-      week: "Week 5",
+      week: "week 5",
       songName: "motels",
       artist: "royel otis",
       youtubeId: "_J3Lks5GVQs"
     },
     {
-      week: "Week 6",
+      week: "week 6",
       songName: "bloom",
       artist: "the paper kites",
       youtubeId: "Cyx2CWBVfDE"
     },
     {
-      week: "Week 7",
+      week: "week 7",
       songName: "brazil",
       artist: "declan mckenna",
       youtubeId: "sSUecTSYulM"
     },
     {
-      week: "Week 8",
+      week: "week 8",
       songName: "memoria (burnt edit)",
       artist: "philip mchale",
       youtubeId: "RREc6aKHk-M"
     },
     {
-      week: "Week 9",
+      week: "week 9",
       songName: "anything",
       artist: "adrianne lenker",
       youtubeId: "pftT6MhrtLE"
+    },
+    {
+      week: "week 10",
+      songName: "ode to the mets",
+      artist: "the strokes",
+      youtubeId: "CU0i9W_XkDI"
     }
   ]
 }
