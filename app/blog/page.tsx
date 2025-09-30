@@ -1,4 +1,5 @@
 import { BlogPosts } from 'app/components/posts'
+import { AnimatedHeading } from 'app/components/animated-heading'
 import Link from 'next/link'
 
 export const metadata = {
@@ -26,7 +27,10 @@ function RSSIcon() {
 export default function Page() {
   return (
     <section>
-      <h1 className="font-semibold text-2xl tracking-tighter mb-8">blogs</h1>
+      <AnimatedHeading className="font-semibold text-2xl tracking-tighter mb-8">
+        blogs
+      </AnimatedHeading>
+
       <div>
         {/* RSS Feed as pinned post */}
         <Link

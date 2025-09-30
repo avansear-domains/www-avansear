@@ -1,4 +1,5 @@
 import { ProjectPosts } from '../components/project-posts'
+import { AnimatedHeading } from '../components/animated-heading'
 
 export const metadata = {
   title: 'Projects',
@@ -8,7 +9,9 @@ export const metadata = {
 export default function Page() {
   return (
     <section>
-      <h1 className="font-semibold text-2xl mb-8 tracking-tighter">projects</h1>
+      <AnimatedHeading className="font-semibold text-2xl mb-8 tracking-tighter">
+        projects
+      </AnimatedHeading>
       <ProjectPosts />
     </section>
   )

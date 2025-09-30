@@ -1,23 +1,19 @@
 'use client'
 
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 import { useState } from 'react'
+import { AnimatedHeading } from 'app/components/animated-heading'
 
 export default function Page() {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
     <section>
-      <div 
-        className="p-4 -m-4"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <motion.h1 
+      <div className="p-4 -m-4">
+        <AnimatedHeading 
           className="sm:mb-8 text-2xl font-semibold tracking-tighter"
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           <span>i'm avan</span>
           <motion.span
@@ -29,7 +25,7 @@ export default function Page() {
           >
             sear (vishruth siddi)
           </motion.span>
-        </motion.h1>
+        </AnimatedHeading>
       </div>
       
       <p className="sm:mb-4">

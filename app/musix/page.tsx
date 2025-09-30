@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { SongArchive } from '../components/song-archive'
+import { AnimatedHeading } from '../components/animated-heading'
 import { getArchivedSongs } from './archive'
 
 export const metadata: Metadata = {
@@ -17,9 +18,9 @@ export default function MusixPage() {
 
   return (
     <section>
-      <h1 className="title font-semibold text-2xl tracking-tighter mb-8">
+      <AnimatedHeading className="title font-semibold text-2xl tracking-tighter mb-8">
         song of the week
-      </h1>
+      </AnimatedHeading>
       
       <div className="w-full">
         <iframe 
