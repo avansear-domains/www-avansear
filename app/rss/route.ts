@@ -1,5 +1,5 @@
 import { baseUrl } from 'app/sitemap'
-import { getBlogPosts } from 'app/blog/utils'
+import { getBlogPosts } from 'app/writings/utils'
 
 export async function GET() {
   let allBlogs = await getBlogPosts()
@@ -15,12 +15,12 @@ export async function GET() {
       (post) =>
         `<item>
           <title><![CDATA[${post.metadata.title}]]></title>
-          <link>${baseUrl}/blog/${post.slug}</link>
+          <link>${baseUrl}/writings/${post.slug}</link>
           <description><![CDATA[${post.metadata.summary || post.metadata.title}]]></description>
           <pubDate>${new Date(
             post.metadata.publishedAt
           ).toUTCString()}</pubDate>
-          <guid isPermaLink="true">${baseUrl}/blog/${post.slug}</guid>
+          <guid isPermaLink="true">${baseUrl}/writings/${post.slug}</guid>
           <author>avan@avansear.com (Avan)</author>
         </item>`
     )

@@ -3,8 +3,8 @@ import { AnimatedHeading } from 'app/components/animated-heading'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Blog',
-  description: 'Read my blog.',
+  title: 'Writings',
+  description: 'Read my writings.',
 }
 
 function RSSIcon() {
@@ -32,7 +32,6 @@ export default function Page() {
       </AnimatedHeading>
 
       <div>
-        {/* RSS Feed as pinned post */}
         <Link
           className="flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]"
           href="/rss"
@@ -46,10 +45,10 @@ export default function Page() {
             </p>
           </div>
         </Link>
-        
-        {/* Regular blog posts */}
         <BlogPosts />
       </div>
     </section>
   )
 }
+
+

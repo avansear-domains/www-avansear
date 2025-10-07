@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { formatDate, getBlogPosts } from 'app/blog/utils'
+import { formatDate, getBlogPosts } from 'app/writings/utils'
 import { baseUrl } from 'app/sitemap'
 import { ClientContent } from 'app/components/client-content'
 import { InternalHoverButton } from 'app/components/hover-button'
@@ -36,7 +36,7 @@ export function generateMetadata({ params }) {
       description,
       type: 'article',
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/writings/${post.slug}`,
       images: [
         {
           url: ogImage,
@@ -60,7 +60,6 @@ export default function Blog({ params }) {
     notFound()
   }
 
-  // Determine previous and next posts based on publishedAt (ascending)
   let ordered = [...allPosts].sort((a, b) =>
     new Date(a.metadata.publishedAt) < new Date(b.metadata.publishedAt) ? -1 : 1
   )
@@ -84,7 +83,7 @@ export default function Blog({ params }) {
             image: post!.metadata.image
               ? `${baseUrl}${post!.metadata.image}`
               : `/og?title=${encodeURIComponent(post!.metadata.title)}`,
-            url: `${baseUrl}/blog/${post!.slug}`,
+            url: `${baseUrl}/writings/${post!.slug}`,
             author: {
               '@type': 'Person',
               name: 'My Portfolio',
@@ -99,12 +98,12 @@ export default function Blog({ params }) {
         </h1>
         <div className="flex space-x-2">
           {prevSlug && (
-            <InternalHoverButton href={`/blog/${prevSlug}`} aria-label="Previous post">
+            <InternalHoverButton href={`/writings/${prevSlug}`} aria-label="Previous post">
               &lt;
             </InternalHoverButton>
           )}
           {nextSlug && (
-            <InternalHoverButton href={`/blog/${nextSlug}`} aria-label="Next post">
+            <InternalHoverButton href={`/writings/${nextSlug}`} aria-label="Next post">
               &gt;
             </InternalHoverButton>
           )}
@@ -122,3 +121,5 @@ export default function Blog({ params }) {
     </section>
   )
 }
+
+
