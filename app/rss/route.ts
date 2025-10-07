@@ -29,7 +29,7 @@ export async function GET() {
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>avan's blog</title>
+        <title>avan's writings</title>
         <link>${baseUrl}</link>
         <description>random stories by avan :D</description>
         <language>en-US</language>

@@ -28,7 +28,7 @@ export default function Page() {
   return (
     <section>
       <AnimatedHeading className="font-semibold text-2xl tracking-tighter mb-8">
-        blogs
+        writings
       </AnimatedHeading>
 
       <div>
