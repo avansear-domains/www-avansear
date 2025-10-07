@@ -3,8 +3,8 @@ import { AnimatedHeading } from 'app/components/animated-heading'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Writings',
-  description: 'Read my writings.',
+  title: 'writings',
+  description: 'all my writings',
 }
 
 function RSSIcon() {
