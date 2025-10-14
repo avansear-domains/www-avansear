@@ -1,11 +1,10 @@
 import { notFound } from 'next/navigation'
 import { getWeeklingPost, getWeeklingSlugs } from '../utils'
-import { SimpleWhiteboard } from '../../components/simple-whiteboard'
 
 interface WeeklingPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export async function generateStaticParams() {
@@ -15,8 +14,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export default function WeeklingPage({ params }: WeeklingPageProps) {
-  const post = getWeeklingPost(params.slug)
+export default async function WeeklingPage({ params }: WeeklingPageProps) {
+  const resolvedParams = await params
+  const post = getWeeklingPost(resolvedParams.slug)
 
   if (!post) {
     notFound()
@@ -26,23 +26,6 @@ export default function WeeklingPage({ params }: WeeklingPageProps) {
     // Import and render the musix component
     const MusixPage = require('../../musix/page').default
     return <MusixPage />
-  }
-
-  if (post.slug === 'whiteboard') {
-    return (
-      <section>
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">{post.title}</h1>
-          <p className="text-sm opacity-70">
-            {post.description}
-          </p>
-        </div>
-        
-        <div className="w-80 h-80 mx-auto">
-          <SimpleWhiteboard />
-        </div>
-      </section>
-    )
   }
 
   return null

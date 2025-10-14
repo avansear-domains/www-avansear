@@ -3,7 +3,6 @@
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { AnimatedHeading } from 'app/components/animated-heading'
-import { SimpleWhiteboard } from 'app/components/simple-whiteboard'
 
 export default function Page() {
   const [isHovered, setIsHovered] = useState(false)
@@ -32,14 +31,6 @@ export default function Page() {
       <p className="sm:mb-4">
         {`high functioning insomniac. 20 y/o weirdo who does things based on instincts and intuition.`}
       </p>
-      
-      {/* Simple Whiteboard */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-3">Draw something</h2>
-        <div className="w-80 h-80 mx-auto">
-          <SimpleWhiteboard size={320} />
-        </div>
-      </div>
     </section>
   )
 }

@@ -12,8 +12,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export function generateMetadata({ params }) {
-  let post = getBlogPosts().find((post) => post.slug === params.slug)
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params
+  let post = getBlogPosts().find((post) => post.slug === resolvedParams.slug)
   if (!post) {
     return
   }
@@ -52,9 +53,10 @@ export function generateMetadata({ params }) {
   }
 }
 
-export default function Blog({ params }) {
+export default async function Blog({ params }) {
+  const resolvedParams = await params
   let allPosts = getBlogPosts()
-  let post = allPosts.find((post) => post.slug === params.slug)
+  let post = allPosts.find((post) => post.slug === resolvedParams.slug)
 
   if (!post) {
     notFound()

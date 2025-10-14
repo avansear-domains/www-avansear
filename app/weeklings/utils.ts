@@ -11,7 +11,7 @@ export interface WeeklingPost {
 const weeklingsDirectory = path.join(process.cwd(), 'app/weeklings/posts')
 
 export function getWeeklingSlugs(): string[] {
-  return ['musix', 'whiteboard']
+  return ['musix']
 }
 
 export function formatDate(date: string, includeRelative = false) {
@@ -63,12 +63,6 @@ export function getWeeklingPost(slug: string): WeeklingPost | null {
       title: 'musix',
       description: 'music archive and playlists',
       publishedAt: '2024-12-15'
-    },
-    whiteboard: {
-      slug: 'whiteboard', 
-      title: 'whiteboard',
-      description: 'collaborative drawing space',
-      publishedAt: '2024-12-22'
     }
   }
 
