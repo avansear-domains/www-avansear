@@ -66,6 +66,12 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "ode to the mets",
       artist: "the strokes",
       youtubeId: "CU0i9W_XkDI"
+    },
+    {
+      week: "week 11",
+      songName: "now/before",
+      artist: "german error message",
+      youtubeId: "-5FLliixUqI"
     }
   ]
 }

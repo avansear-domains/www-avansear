@@ -1,17 +1,15 @@
-import fs from 'fs'
-import path from 'path'
+import { getWeeklingEntries as getArchivedWeeklings } from './archive'
 
-export interface WeeklingPost {
-  slug: string
+export interface WeeklingEntry {
+  week: string
   title: string
   description: string
+  url: string
   publishedAt: string
 }
 
-const weeklingsDirectory = path.join(process.cwd(), 'app/weeklings/posts')
-
-export function getWeeklingSlugs(): string[] {
-  return ['musix']
+export function getWeeklingEntries(): WeeklingEntry[] {
+  return getArchivedWeeklings()
 }
 
 export function formatDate(date: string, includeRelative = false) {
@@ -54,22 +52,4 @@ export function formatDate(date: string, includeRelative = false) {
   }
 
   return `${fullDate} (${formattedDate})`
-}
-
-export function getWeeklingPost(slug: string): WeeklingPost | null {
-  const weeklingPosts: Record<string, WeeklingPost> = {
-    musix: {
-      slug: 'musix',
-      title: 'musix',
-      description: 'music archive and playlists',
-      publishedAt: '2024-12-15'
-    }
-  }
-
-  return weeklingPosts[slug] || null
-}
-
-export function getAllWeeklingPosts(): WeeklingPost[] {
-  const slugs = getWeeklingSlugs()
-  return slugs.map(slug => getWeeklingPost(slug)!).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 }
