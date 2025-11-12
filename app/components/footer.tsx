@@ -54,10 +54,10 @@ export default function Footer() {
           </HoverButton>
         </li>
         <li>
-          <HoverButton href="https://www.linkedin.com/in/avansear">
+          <HoverButton href="https://github.com/avansear/">
             <div className="flex items-center">
               <ArrowIcon />
-              <p className="ml-2 h-7">linkedin</p>
+              <p className="ml-2 h-7">github</p>
             </div>
           </HoverButton>
         </li>
