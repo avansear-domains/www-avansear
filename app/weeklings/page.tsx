@@ -4,6 +4,12 @@ import { getWeeklingEntries, formatDate } from './utils'
 
 export default function WeeklingsPage() {
   const entries = getWeeklingEntries()
+    .sort((a, b) => {
+      if (new Date(a.publishedAt) > new Date(b.publishedAt)) {
+        return -1
+      }
+      return 1
+    })
 
   return (
     <section>
