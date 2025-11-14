@@ -139,7 +139,7 @@ export function Navbar() {
             {themes.map((theme) => (
               <button
                 key={theme.id}
-                className={`w-5 h-5 rounded-full border border-2 transition-colors hover:opacity-80`}
+                className={`w-5 h-5 rounded-full border-2 transition-colors hover:opacity-80`}
                 style={{
                   backgroundColor: theme.bgColor,
                   borderColor: theme.borderColor,
