@@ -72,6 +72,48 @@ export function getArchivedSongs(): ArchivedSong[] {
       songName: "now/before",
       artist: "german error message",
       youtubeId: "-5FLliixUqI"
+    },
+    {
+      week: "week 12",
+      songName: "easy love",
+      artist: "west 22nd",
+      youtubeId: "xZhBtoEGyxI"
+    },
+    {
+      week: "week 13",
+      songName: "side by side",
+      artist: "jacklen ro",
+      youtubeId: "FFhAHf2cYeo"
+    },
+    {
+      week: "week 14",
+      songName: "ain't as pretty a blue",
+      artist: "fleeland (frances whitney + mills)",
+      youtubeId: "mERXA4gje5I"
+    },
+    {
+      week: "week 15",
+      songName: "long nights",
+      artist: "moondoggy",
+      youtubeId: "C0Z1e5dLm1s"
+    },
+    {
+      week: "week 16",
+      songName: "why",
+      artist: "dominic fike",
+      youtubeId: "YMgVBrlZtKU"
+    },
+    {
+      week: "week 17",
+      songName: "false art",
+      artist: "ben kessler, lizzy mcalpine",
+      youtubeId: "bLawR8gJaW8"
+    },
+    {
+      week: "week 18",
+      songName: "fuzzybrain",
+      artist: "dayglow",
+      youtubeId: "SXpw7Z2atGk"
     }
   ]
 }
