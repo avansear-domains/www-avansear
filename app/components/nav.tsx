@@ -153,7 +153,7 @@ export function Navbar() {
           {/* Mobile: Show dropdown */}
           <div className="sm:hidden relative theme-dropdown flex items-center">
             <button
-              className={`w-5 h-5 rounded-full border border-2 transition-colors hover:opacity-80`}
+              className={`w-5 h-5 rounded-full border-2 transition-colors hover:opacity-80`}
               style={{
                 backgroundColor: activeTheme.bgColor,
                 borderColor: activeTheme.borderColor,
@@ -171,7 +171,7 @@ export function Navbar() {
                     .map((theme) => (
                       <button
                         key={theme.id}
-                        className={`w-5 h-5 rounded-full border border-2 transition-colors hover:opacity-80`}
+                        className={`w-5 h-5 rounded-full border-2 transition-colors hover:opacity-80`}
                         style={{
                           backgroundColor: theme.bgColor,
                           borderColor: theme.borderColor,
