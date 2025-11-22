@@ -11,7 +11,7 @@ export default function Page() {
     <section>
       <div className="p-4 -m-4">
         <AnimatedHeading 
-          className="sm:mb-8 text-2xl font-semibold tracking-tighter"
+          className="mb-4 sm:mb-8 text-2xl font-semibold tracking-tighter"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >

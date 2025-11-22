@@ -11,7 +11,7 @@ export default function Page() {
     <section>
       <div className="p-4 -m-4">
         <AnimatedHeading 
-          className="sm:mb-8 text-2xl font-semibold tracking-tighter"
+          className="mb-4 sm:mb-8 text-2xl font-semibold tracking-tighter"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -28,13 +28,13 @@ export default function Page() {
         </AnimatedHeading>
       </div>
       
-      <p className="sm:mb-8">
+      <p className="mb-4 sm:mb-8">
         {`if you're seeing this page because you tapped on an nfc sticker on a random device you found, you're in the right place!`}
       </p>
-      <p className="sm:mb-8">
+      <p className="mb-4 sm:mb-8">
         {`i put nfc stickers on all my devices in case they ever get lost. please use the below contact details to get in touch with me. thank you so much for your help!`}
       </p>
-      <p className="sm:mb-4">
+      <p className="mb-4 sm:mb-4">
         {`in case you choose not to return this, then boooo :(`}
       </p>
     </section>
