@@ -28,10 +28,10 @@ export default function Page() {
         </AnimatedHeading>
       </div>
       
-      <p className="sm:mb-4">
+      <p className="sm:mb-8">
         {`if you're seeing this page because you tapped on an nfc sticker on a random device you found, you're in the right place!`}
       </p>
-      <p className="sm:mb-4">
+      <p className="sm:mb-8">
         {`i put nfc stickers on all my devices in case they ever get lost. please use the below contact details to get in touch with me. thank you so much for your help!`}
       </p>
       <p className="sm:mb-4">
