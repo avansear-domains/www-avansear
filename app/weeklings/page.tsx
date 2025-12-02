@@ -1,6 +1,12 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { AnimatedHeading } from '../components/animated-heading'
 import { getWeeklingEntries, formatDate } from './utils'
+
+export const metadata: Metadata = {
+  title: 'weeklings',
+  description: "i called this page weeklings because i'd make a diff thing every week and put it here lol, but we're not on a weekly time anymore hehe, i'll still make shit tho :>",
+}
 
 export default function WeeklingsPage() {
   const entries = getWeeklingEntries()
@@ -13,9 +19,14 @@ export default function WeeklingsPage() {
 
   return (
     <section>
-      <AnimatedHeading className="font-semibold text-2xl tracking-tighter mb-8">
-        weeklings
-      </AnimatedHeading>
+      <div className="mb-8">
+        <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
+          weeklings
+        </AnimatedHeading>
+        <p className="text-[var(--color-dark)] dark:text-[var(--color-light)]">
+          {"i called this page weeklings because i'd make a diff thing every week and put it here lol, but we're not on a weekly time anymore hehe, i'll still make shit tho :>"}
+        </p>
+      </div>
 
       <div>
         {entries.map((entry) => (

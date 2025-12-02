@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'writings',
-  description: 'all my writings',
+  description: "all the stuff i've written :D",
 }
 
 function RSSIcon() {
@@ -27,15 +27,17 @@ function RSSIcon() {
 export default function Page() {
   return (
     <section>
-      <AnimatedHeading className="font-semibold text-2xl tracking-tighter mb-8">
-        writings
-      </AnimatedHeading>
+      <div className="mb-8">
+        <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
+          writings
+        </AnimatedHeading>
+        <p className="text-[var(--color-dark)] dark:text-[var(--color-light)]">
+          all the stuff i've written :D
+        </p>
+      </div>
 
       <div>
-        <Link
-          className="flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]"
-          href="/rss"
-        >
+        <Link className="flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]" href="/rss">
           <div className="w-full flex flex-row space-x-2 items-center">
             <p className="text-[var(--color-light-80)] w-fit tracking-tighter whitespace-nowrap flex-shrink-0">
               rss feed

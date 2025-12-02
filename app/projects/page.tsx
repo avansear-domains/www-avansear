@@ -9,9 +9,14 @@ export const metadata = {
 export default function Page() {
   return (
     <section>
-      <AnimatedHeading className="font-semibold text-2xl mb-8 tracking-tighter">
-        projects
-      </AnimatedHeading>
+      <div className="mb-8">
+        <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
+          projects
+        </AnimatedHeading>
+        <p className="text-[var(--color-dark)] dark:text-[var(--color-light)]">
+          cool shit i did
+        </p>
+      </div>
       <ProjectPosts />
     </section>
   )
