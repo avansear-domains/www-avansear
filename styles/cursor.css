@@ -2,14 +2,20 @@
 
 /* Base cursor hiding - only on md screens and larger (768px+) and when not disabled */
 @media (min-width: 768px) {
+  /* Ensure html and body take full viewport and hide cursor */
   html:not(.cursor-disabled) {
     cursor: none;
+    width: 100%;
+    height: 100%;
   }
 
   html:not(.cursor-disabled) body {
     cursor: none;
+    min-height: 100vh;
+    width: 100%;
   }
 
+  /* Hide cursor on all elements and pseudo-elements */
   html:not(.cursor-disabled) *, 
   html:not(.cursor-disabled) *::before, 
   html:not(.cursor-disabled) *::after {
@@ -32,9 +38,16 @@
 /* Firefox-specific cursor hiding - only on desktop and when not disabled */
 @media (min-width: 768px) {
   @-moz-document url-prefix() {
-    html:not(.cursor-disabled), 
+    html:not(.cursor-disabled) {
+      cursor: none !important;
+      width: 100%;
+      height: 100%;
+    }
+    
     html:not(.cursor-disabled) body {
       cursor: none !important;
+      min-height: 100vh;
+      width: 100%;
     }
     
     html:not(.cursor-disabled) *, 
@@ -78,10 +91,18 @@
 /* Safari/WebKit-specific cursor hiding - only on desktop and when not disabled */
 @media (min-width: 768px) {
   @supports (-webkit-appearance: none) {
-    html:not(.cursor-disabled), 
+    html:not(.cursor-disabled) {
+      cursor: none !important;
+      -webkit-cursor: none !important;
+      width: 100%;
+      height: 100%;
+    }
+    
     html:not(.cursor-disabled) body {
       cursor: none !important;
       -webkit-cursor: none !important;
+      min-height: 100vh;
+      width: 100%;
     }
     
     html:not(.cursor-disabled) *, 
