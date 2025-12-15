@@ -71,16 +71,16 @@ export function CustomCursor() {
     // Add resize listener for responsive behavior
     window.addEventListener('resize', checkScreenSize, { passive: true })
     
-    // Only add mouse listeners if desktop
-    if (isDesktop) {
+    // Only add mouse listeners if desktop and cursor is enabled
+    if (isDesktop && isCursorEnabled) {
       document.addEventListener('mousemove', updateMousePosition, { passive: true })
       document.addEventListener('mouseenter', handleMouseEnter)
       document.addEventListener('mouseleave', handleMouseLeave)
       document.addEventListener('mouseover', handleMouseOver, { passive: true })
     }
 
-    // Browser-specific cursor hiding optimizations (only on desktop)
-    if (isDesktop && isFirefox) {
+    // Browser-specific cursor hiding optimizations (only on desktop and when enabled)
+    if (isDesktop && isCursorEnabled && isFirefox) {
       // More aggressive Firefox cursor hiding
       document.body.style.cursor = 'none'
       document.documentElement.style.cursor = 'none'
@@ -116,7 +116,7 @@ export function CustomCursor() {
       ;(window as any).firefoxCursorInterval = firefoxCursorCheck
     }
     
-    if (isDesktop && (isSafari || isWebKit)) {
+    if (isDesktop && isCursorEnabled && (isSafari || isWebKit)) {
       // Safari sometimes needs additional cursor hiding
       document.body.style.cursor = 'none'
       document.documentElement.style.cursor = 'none'
@@ -188,7 +188,7 @@ export function CustomCursor() {
         document.body.removeAttribute('data-custom-cursor-style')
       }
     }
-  }, [updateMousePosition, handleMouseOver, checkScreenSize, isDesktop])
+  }, [updateMousePosition, handleMouseOver, checkScreenSize, isDesktop, isCursorEnabled])
 
   // Calculate position with offset for hover state
   const offsetX = isHovering ? 6 : 4
