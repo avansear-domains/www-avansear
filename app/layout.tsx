@@ -19,10 +19,10 @@ export const metadata: Metadata = {
   description: 'say hi :)',
   icons: {
     icon: [
-      { url: '/favi.png', type: 'image/png' },
-      { url: '/icon.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favi.png', sizes: 'any' },
     ],
-    shortcut: '/favi.png',
+    shortcut: '/favicon.ico',
     apple: '/favi.png',
   },
   openGraph: {
@@ -71,9 +71,6 @@ export default function RootLayout({
       )}
     >
       <head>
-        <link rel="icon" href="/favi.png" type="image/png" />
-        <link rel="shortcut icon" href="/favi.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/favi.png" />
         <link
           rel="alternate"
           type="application/rss+xml"
