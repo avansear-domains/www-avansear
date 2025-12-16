@@ -18,7 +18,10 @@ export const metadata: Metadata = {
   title: 'avan',
   description: 'say hi :)',
   icons: {
-    icon: '/favi.png',
+    icon: [
+      { url: '/favi.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
     shortcut: '/favi.png',
     apple: '/favi.png',
   },
@@ -68,6 +71,9 @@ export default function RootLayout({
       )}
     >
       <head>
+        <link rel="icon" href="/favi.png" type="image/png" />
+        <link rel="shortcut icon" href="/favi.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favi.png" />
         <link
           rel="alternate"
           type="application/rss+xml"
