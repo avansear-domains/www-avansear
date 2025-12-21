@@ -67,6 +67,7 @@ export default function RootLayout({
       data-theme="theme5"
       className={cx(
         'text-[var(--color-dark)] bg-[var(--color-light)] dark:text-[var(--color-light)] dark:bg-[var(--color-dark)]',
+        'min-h-screen',
         GeistSans.variable,
         GeistMono.variable
       )}
@@ -86,7 +87,7 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="antialiased max-w-xl mx-4 mt-8 sm:mx-auto">
+      <body className="antialiased max-w-xl mx-4 mt-8 sm:mx-auto min-h-screen">
         <script
           dangerouslySetInnerHTML={{
             __html: `
