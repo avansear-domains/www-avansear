@@ -58,7 +58,9 @@ function getMDXData(dir) {
 }
 
 export function getFontPosts() {
-  return getMDXData(path.join(process.cwd(), 'app', 'mifavoritafonts', 'posts'))
+  return getMDXData(path.join(process.cwd(), 'app', 'writings', 'posts')).filter(
+    (post) => post.metadata.type !== undefined
+  )
 }
 
 export function formatDate(date: string, includeRelative = false) {
