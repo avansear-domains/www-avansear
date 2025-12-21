@@ -7,14 +7,12 @@
     cursor: none !important;
     width: 100%;
     min-height: 100vh;
-    /* Remove height: 100% to allow html to grow with content */
     position: relative;
   }
 
   html:not(.cursor-disabled) body {
     cursor: none !important;
     width: 100%;
-    min-height: 100vh;
     /* Remove height constraint to allow body to grow with content */
     overflow-x: hidden;
     position: relative;
@@ -52,13 +50,11 @@
       cursor: none !important;
       width: 100%;
       min-height: 100vh;
-      /* Remove height: 100% to allow html to grow with content */
     }
     
     html:not(.cursor-disabled) body {
       cursor: none !important;
       width: 100%;
-      min-height: 100vh;
       /* Remove height constraint to allow body to grow with content */
       overflow-x: hidden;
     }
@@ -109,7 +105,6 @@
       -webkit-cursor: none !important;
       width: 100%;
       min-height: 100vh;
-      /* Remove height: 100% to allow html to grow with content */
     }
     
     html:not(.cursor-disabled) body {
@@ -119,6 +114,7 @@
       min-height: 100vh;
       /* Remove height constraint to allow body to grow with content */
       overflow-x: hidden;
+      overflow-y: auto;
     }
     
     html:not(.cursor-disabled) *, 

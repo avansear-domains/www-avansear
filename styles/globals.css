@@ -10,10 +10,25 @@
   html {
     user-select: none;
     min-height: 100vh;
+    overflow-x: hidden;
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+  }
+  
+  /* Hide scrollbar for Chrome, Safari, and Edge */
+  html::-webkit-scrollbar {
+    display: none;
   }
   
   body {
-    min-height: 100vh;
+    overflow-x: hidden;
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+  }
+  
+  /* Hide scrollbar for Chrome, Safari, and Edge */
+  body::-webkit-scrollbar {
+    display: none;
   }
   
   html:not([data-theme]) {
