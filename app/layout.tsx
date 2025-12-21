@@ -65,6 +65,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="theme5"
+      suppressHydrationWarning
       className={cx(
         'text-[var(--color-dark)] bg-[var(--color-light)] dark:text-[var(--color-light)] dark:bg-[var(--color-dark)]',
         'min-h-screen',

@@ -73,12 +73,57 @@ export function CustomCursor() {
     
     // Only add mouse listeners if desktop and cursor is enabled
     if (isDesktop && isCursorEnabled) {
+      // Ensure document covers full viewport for cursor hiding
+      document.documentElement.style.setProperty('min-height', '100vh', 'important')
+      document.body.style.setProperty('min-height', '100vh', 'important')
+      
       document.addEventListener('mousemove', updateMousePosition, { passive: true })
       document.addEventListener('mouseenter', handleMouseEnter)
       document.addEventListener('mouseleave', handleMouseLeave)
       document.addEventListener('mouseover', handleMouseOver, { passive: true })
+      
+      // Add a global style to ensure cursor is hidden everywhere, including scrollable areas
+      const globalCursorStyle = document.createElement('style')
+      globalCursorStyle.id = 'global-cursor-hide'
+      globalCursorStyle.textContent = `
+        html:not(.cursor-disabled),
+        html:not(.cursor-disabled) *,
+        html:not(.cursor-disabled) *::before,
+        html:not(.cursor-disabled) *::after {
+          cursor: none !important;
+        }
+        /* Ensure html grows with content, not constrained to viewport */
+        html:not(.cursor-disabled) {
+          min-height: 100vh !important;
+          height: auto !important;
+        }
+        body:not(.cursor-disabled) {
+          min-height: 100vh !important;
+          height: auto !important;
+        }
+      `
+      document.head.appendChild(globalCursorStyle)
+      
+      // Also ensure the document itself has cursor hidden
+      if (document.documentElement) {
+        document.documentElement.style.setProperty('cursor', 'none', 'important')
+      }
     }
 
+    // Ensure document/viewport always hides cursor
+    if (isDesktop && isCursorEnabled) {
+      // Apply to document element and ensure it covers full viewport
+      // But allow it to grow with content (don't set height, only min-height)
+      document.documentElement.style.setProperty('cursor', 'none', 'important')
+      document.documentElement.style.setProperty('min-height', '100vh', 'important')
+      // Remove any height constraint that might prevent growth
+      document.documentElement.style.removeProperty('height')
+      document.body.style.setProperty('cursor', 'none', 'important')
+      document.body.style.setProperty('min-height', '100vh', 'important')
+      // Remove any height constraint that might prevent growth
+      document.body.style.removeProperty('height')
+    }
+    
     // Browser-specific cursor hiding optimizations (only on desktop and when enabled)
     if (isDesktop && isCursorEnabled && isFirefox) {
       // More aggressive Firefox cursor hiding
@@ -157,6 +202,12 @@ export function CustomCursor() {
         document.removeEventListener('mouseenter', handleMouseEnter)
         document.removeEventListener('mouseleave', handleMouseLeave)
         document.removeEventListener('mouseover', handleMouseOver)
+        
+        // Remove global cursor style
+        const globalStyle = document.getElementById('global-cursor-hide')
+        if (globalStyle) {
+          globalStyle.remove()
+        }
       }
       
       // Cleanup browser-specific styles

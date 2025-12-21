@@ -4,23 +4,31 @@
 @media (min-width: 768px) {
   /* Ensure html and body take full viewport and hide cursor */
   html:not(.cursor-disabled) {
-    cursor: none;
+    cursor: none !important;
     width: 100%;
     min-height: 100vh;
-    height: 100%;
+    /* Remove height: 100% to allow html to grow with content */
+    position: relative;
   }
 
   html:not(.cursor-disabled) body {
-    cursor: none;
+    cursor: none !important;
     width: 100%;
     min-height: 100vh;
+    /* Remove height constraint to allow body to grow with content */
     overflow-x: hidden;
+    position: relative;
   }
 
   /* Hide cursor on all elements and pseudo-elements */
   html:not(.cursor-disabled) *, 
   html:not(.cursor-disabled) *::before, 
   html:not(.cursor-disabled) *::after {
+    cursor: none !important;
+  }
+  
+  /* Ensure viewport/document itself hides cursor - apply to root */
+  :root:not(.cursor-disabled) {
     cursor: none !important;
   }
 
@@ -44,13 +52,14 @@
       cursor: none !important;
       width: 100%;
       min-height: 100vh;
-      height: 100%;
+      /* Remove height: 100% to allow html to grow with content */
     }
     
     html:not(.cursor-disabled) body {
       cursor: none !important;
       width: 100%;
       min-height: 100vh;
+      /* Remove height constraint to allow body to grow with content */
       overflow-x: hidden;
     }
     
@@ -100,7 +109,7 @@
       -webkit-cursor: none !important;
       width: 100%;
       min-height: 100vh;
-      height: 100%;
+      /* Remove height: 100% to allow html to grow with content */
     }
     
     html:not(.cursor-disabled) body {
@@ -108,6 +117,7 @@
       -webkit-cursor: none !important;
       width: 100%;
       min-height: 100vh;
+      /* Remove height constraint to allow body to grow with content */
       overflow-x: hidden;
     }
     
