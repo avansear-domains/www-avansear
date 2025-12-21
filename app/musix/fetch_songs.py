@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Script to fetch songs from YouTube Music playlist and update archive.ts
+Script to fetch songs from YouTube Music playlist and add to Supabase database
 """
 import os
 import re
-from pathlib import Path
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
+from supabase import create_client, Client
 
 # Load environment variables from .env.local
 load_dotenv('.env.local')
@@ -14,11 +14,16 @@ load_dotenv('.env.local')
 # Configuration
 PLAYLIST_ID = "PLeIBg3zIku5cPNLtN0dAhme8B0lXarZUm"
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
-# Archive file is in the same directory as this script
-ARCHIVE_FILE = Path(__file__).parent / 'archive.ts'
+SUPABASE_URL = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY') or os.getenv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
 if not YOUTUBE_API_KEY:
     raise ValueError("YOUTUBE_API_KEY not found in .env.local")
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("Supabase credentials not found in .env.local")
+
+# Initialize Supabase client
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_playlist_items(youtube, playlist_id):
     """Fetch all items from a YouTube playlist"""
@@ -65,27 +70,28 @@ def get_video_details(youtube, video_ids):
     
     return video_details
 
-def parse_archive_file():
-    """Parse existing archive.ts to extract current songs"""
-    with open(ARCHIVE_FILE, 'r', encoding='utf-8') as f:
-        content = f.read()
-    
-    # Extract all song entries using regex
-    pattern = r'\{\s*week:\s*"([^"]+)",\s*songName:\s*"([^"]+)",\s*artist:\s*"([^"]+)",\s*youtubeId:\s*"([^"]+)"\s*\}'
-    matches = re.findall(pattern, content)
+def get_existing_songs():
+    """Get existing songs from Supabase"""
+    response = supabase.table('musix_songs').select('youtube_id, week, song_name, artist').execute()
     
     songs_by_id = {}
-    songs_by_name_artist = {}  # Track by normalized song name + artist
+    songs_by_name_artist = {}
     max_week = 0
     
-    for week, song_name, artist, youtube_id in matches:
+    for song in response.data:
+        youtube_id = song['youtube_id']
+        week = song['week']
+        song_name = song['song_name']
+        artist = song['artist']
+        
         songs_by_id[youtube_id] = {
             'week': week,
             'songName': song_name,
             'artist': artist,
             'youtubeId': youtube_id
         }
-        # Also track by normalized song name + artist (case-insensitive)
+        
+        # Track by normalized song name + artist (case-insensitive)
         normalized_key = f"{song_name.lower().strip()}|{artist.lower().strip()}"
         songs_by_name_artist[normalized_key] = {
             'week': week,
@@ -93,71 +99,26 @@ def parse_archive_file():
             'artist': artist,
             'youtubeId': youtube_id
         }
+        
         # Extract week number
-        week_num = int(re.search(r'\d+', week).group())
+        week_num = int(re.search(r'\d+', week).group()) if re.search(r'\d+', week) else 0
         max_week = max(max_week, week_num)
     
-    return songs_by_id, songs_by_name_artist, max_week, content
+    return songs_by_id, songs_by_name_artist, max_week
 
-def extract_video_id(video_id_or_url):
-    """Extract video ID from various YouTube URL formats or return as-is"""
-    patterns = [
-        r'(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})',
-        r'^([a-zA-Z0-9_-]{11})$'
-    ]
-    
-    for pattern in patterns:
-        match = re.search(pattern, video_id_or_url)
-        if match:
-            return match.group(1)
-    
-    return video_id_or_url
-
-def format_song_entry(week_num, song_name, artist, youtube_id):
-    """Format a song entry in the archive.ts format"""
-    week_str = f"week {week_num:02d}"
-    return f"""    {{
-      week: "{week_str}",
-      songName: "{song_name}",
-      artist: "{artist}",
-      youtubeId: "{youtube_id}"
-    }}"""
-
-def update_archive_file(existing_content, new_songs):
-    """Update archive.ts with new songs"""
-    # Handle empty array case: "return [\n  ]\n}"
-    empty_array_pattern = r'(return\s+\[\s*\n\s*)(\]\s*\n\s*\})'
-    empty_match = re.search(empty_array_pattern, existing_content)
-    
-    if empty_match:
-        # Array is empty, just insert songs
-        new_entries = ',\n'.join(new_songs)
-        updated_content = re.sub(
-            empty_array_pattern,
-            f'return [\n{new_entries}\n  ]',
-            existing_content,
-            count=1
-        )
-        return updated_content
-    
-    # Handle non-empty array: find last } before ] }
-    # Format: "    }\n  ]\n}"
-    pattern = r'(\}\s*\n\s*)(\]\s*\n\s*\})'
-    
-    def replace_func(match):
-        # Insert new songs before the closing bracket
-        # Add comma after last entry, then new entries with proper formatting
-        new_entries = ',\n'.join(new_songs)
-        # match.group(1) is "    }\n" (closing brace of last entry)
-        # match.group(2) is "  ]\n}" (closing brackets)
-        return f'{match.group(1)},{new_entries}\n  {match.group(2)}'
-    
-    updated_content = re.sub(pattern, replace_func, existing_content, count=1)
-    
-    if updated_content == existing_content:
-        raise ValueError("Failed to find insertion point in archive.ts. File format may have changed.")
-    
-    return updated_content
+def add_song_to_db(week, song_name, artist, youtube_id):
+    """Add a song to Supabase database"""
+    try:
+        response = supabase.table('musix_songs').insert({
+            'week': week,
+            'song_name': song_name,
+            'artist': artist,
+            'youtube_id': youtube_id
+        }).execute()
+        return True
+    except Exception as e:
+        print(f"  Error adding song to database: {e}")
+        return False
 
 def main():
     # Initialize YouTube API client
@@ -167,9 +128,9 @@ def main():
     playlist_items = get_playlist_items(youtube, PLAYLIST_ID)
     print(f"Found {len(playlist_items)} items in playlist")
     
-    # Parse existing archive
-    existing_songs_by_id, existing_songs_by_name_artist, max_week, archive_content = parse_archive_file()
-    print(f"Found {len(existing_songs_by_id)} existing songs in archive (max week: {max_week})")
+    # Get existing songs from database
+    existing_songs_by_id, existing_songs_by_name_artist, max_week = get_existing_songs()
+    print(f"Found {len(existing_songs_by_id)} existing songs in database (max week: {max_week})")
     
     # Get video IDs to fetch actual channel information
     video_ids = [item['contentDetails']['videoId'] for item in playlist_items]
@@ -177,7 +138,7 @@ def main():
     video_details = get_video_details(youtube, video_ids)
     
     # Process playlist items in order they appear in playlist
-    new_songs = []
+    new_songs_count = 0
     new_week = max_week + 1
     
     for item in playlist_items:
@@ -185,7 +146,7 @@ def main():
         snippet = item['snippet']
         title = snippet['title']
         
-        # Skip if already in archive by video ID
+        # Skip if already in database by video ID
         if video_id in existing_songs_by_id:
             print(f"  Skipping (duplicate video ID): {title} ({video_id})")
             continue
@@ -238,28 +199,21 @@ def main():
             print(f"  Skipping (duplicate song): {song_name} by {artist} (already exists as {existing['songName']} by {existing['artist']} in {existing['week']})")
             continue
         
-        # Format entry
-        entry = format_song_entry(new_week, song_name, artist, video_id)
-        new_songs.append(entry)
+        # Format week string
+        week_str = f"week {new_week:02d}"
         
-        print(f"  Adding: week {new_week:02d} - {song_name} by {artist} ({video_id})")
-        new_week += 1
+        # Add to database
+        if add_song_to_db(week_str, song_name, artist, video_id):
+            print(f"  Added: week {new_week:02d} - {song_name} by {artist} ({video_id})")
+            new_songs_count += 1
+            new_week += 1
+        else:
+            print(f"  Failed to add: {song_name} by {artist} ({video_id})")
     
-    if not new_songs:
+    if new_songs_count == 0:
         print("No new songs to add!")
-        return
-    
-    print(f"\nAdding {len(new_songs)} new song(s) to archive...")
-    
-    # Update archive file
-    updated_content = update_archive_file(archive_content, new_songs)
-    
-    # Write back to file
-    with open(ARCHIVE_FILE, 'w', encoding='utf-8') as f:
-        f.write(updated_content)
-    
-    print(f"Successfully updated {ARCHIVE_FILE}")
+    else:
+        print(f"\nSuccessfully added {new_songs_count} new song(s) to database!")
 
 if __name__ == '__main__':
     main()
-

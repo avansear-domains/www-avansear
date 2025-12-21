@@ -7,7 +7,7 @@ import { join } from 'path'
 const execAsync = promisify(exec)
 
 const RATE_LIMIT_FILE = join(process.cwd(), '.data', 'musix-rate-limit.json')
-const MAX_EXECUTIONS = 5
+const MAX_EXECUTIONS = 50
 const WINDOW_HOURS = 24
 
 interface RateLimitData {

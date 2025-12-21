@@ -1,23 +1,16 @@
 import { Metadata } from 'next'
-import { SongArchive } from '../components/song-archive'
 import { AnimatedHeading } from '../components/animated-heading'
 import { FetchSongsTrigger } from '../components/fetch-songs-trigger'
-import { getArchivedSongs } from './archive'
+import { getArchivedSongs } from './db'
 
 export const metadata: Metadata = {
   title: 'song of the week',
   description: 'song of the week',
 }
 
-export default function MusixPage() {
-  const archivedSongs = getArchivedSongs()
-  const latestSong = archivedSongs.length > 0
-    ? archivedSongs.sort((a, b) => {
-        const weekA = parseInt(a.week.replace(/\D/g, ''))
-        const weekB = parseInt(b.week.replace(/\D/g, ''))
-        return weekB - weekA
-      })[0]
-    : null
+export default async function MusixPage() {
+  const archivedSongs = await getArchivedSongs()
+  const latestSong = archivedSongs.length > 0 ? archivedSongs[0] : null
 
   return (
     <section>
@@ -45,7 +38,26 @@ export default function MusixPage() {
 
       <div className="mt-16">
         <h2 className="text-xl font-semibold mb-6">weekly archive</h2>
-        <SongArchive />
+        <div>
+          {archivedSongs.map((song) => (
+            <a
+              key={song.youtubeId}
+              className="flex flex-col space-y-1 mb-4"
+              href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="w-full flex flex-row space-x-2">
+                <p className="text-[var(--color-light-80)] w-fit tabular-nums flex-shrink-0">
+                  {song.week.toLowerCase()}
+                </p>
+                <p className="text-[var(--color-dark)] dark:text-[var(--color-light)] tracking-tight">
+                  {song.songName.toLowerCase()} - {song.artist.toLowerCase()}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   )
