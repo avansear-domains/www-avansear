@@ -66,7 +66,7 @@ async function recordExecution() {
 }
 
 async function runFetchScript(): Promise<{ success: boolean; output: string; error?: string }> {
-  const scriptPath = join(process.cwd(), 'scripts', 'musix', 'fetch_songs.py')
+  const scriptPath = join(process.cwd(), 'app', 'musix', 'fetch_songs.py')
   
   // Try different Python paths (anaconda first, then system python3)
   const pythonPaths = [

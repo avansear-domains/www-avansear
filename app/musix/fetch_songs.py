@@ -14,7 +14,8 @@ load_dotenv('.env.local')
 # Configuration
 PLAYLIST_ID = "PLeIBg3zIku5cPNLtN0dAhme8B0lXarZUm"
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
-ARCHIVE_FILE = Path(__file__).parent.parent.parent / 'app' / 'musix' / 'archive.ts'
+# Archive file is in the same directory as this script
+ARCHIVE_FILE = Path(__file__).parent / 'archive.ts'
 
 if not YOUTUBE_API_KEY:
     raise ValueError("YOUTUBE_API_KEY not found in .env.local")
