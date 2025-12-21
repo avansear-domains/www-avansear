@@ -1,5 +1,6 @@
+/* blue on maize - GO BLUE! */
 html[data-theme="theme2"] {
-    --color-dark: #f6d52e;
-    --color-light: #1b0101;
-    --color-light-80: #1b0101BF;
+    --color-dark: #FFCB05;
+    --color-light: #00274C;
+    --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
 }

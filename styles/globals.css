@@ -3,13 +3,17 @@
 @import './themes/theme2.css';
 @import './themes/theme3.css';
 @import './themes/theme4.css';
+@import './themes/theme5.css';
 @import './cursor.css';
 
 @layer base {
   html {
-    --color-dark: #EEE2C0;
-    --color-light: #a53b10;
-    --color-light-80: #a53b10BF;
     user-select: none;
+  }
+  
+  html:not([data-theme]) {
+    --color-dark: #0C0C0C;
+    --color-light: #eeeeee;
+    --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
   }
 }

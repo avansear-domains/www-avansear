@@ -21,7 +21,7 @@ const navItems = {
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false)
-  const [currentTheme, setCurrentTheme] = useState('')
+  const [currentTheme, setCurrentTheme] = useState('theme5')
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false)
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function Navbar() {
     
     // Get current theme from HTML data attribute (already set by blocking script)
     const htmlElement = document.querySelector('html')
-    const theme = htmlElement?.getAttribute('data-theme') || ''
+    const theme = htmlElement?.getAttribute('data-theme') || 'theme5'
     setCurrentTheme(theme)
   }, [])
 
@@ -58,12 +58,6 @@ export function Navbar() {
   // Theme configurations
   const themes = [
     { 
-      id: '', 
-      name: 'Default', 
-      bgColor: '#EEE2C0', 
-      borderColor: '#a53b10' 
-    },
-    { 
       id: 'theme1', 
       name: 'Theme 1', 
       bgColor: '#9E2B25', 
@@ -72,20 +66,26 @@ export function Navbar() {
     { 
       id: 'theme2', 
       name: 'Theme 2', 
-      bgColor: '#f6d52e', 
-      borderColor: '#1b0101' 
+      bgColor: '#FFCB05', 
+      borderColor: '#00274C' 
     },
     { 
       id: 'theme3', 
       name: 'Theme 3', 
-      bgColor: '#01160B', 
-      borderColor: '#E4572E' 
+      bgColor: '#0F0F0E', 
+      borderColor: '#F196E5' 
     },
     { 
       id: 'theme4', 
       name: 'Theme 4', 
-      bgColor: '#0e000e', 
-      borderColor: '#ef9090'
+      bgColor: '#FFEFF5', 
+      borderColor: '#1F7CFF'
+    },
+    { 
+      id: 'theme5', 
+      name: 'Theme 5', 
+      bgColor: '#0C0C0C', 
+      borderColor: '#eeeeee'
     }
   ]
 

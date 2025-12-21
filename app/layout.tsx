@@ -64,6 +64,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="theme5"
       className={cx(
         'text-[var(--color-dark)] bg-[var(--color-light)] dark:text-[var(--color-light)] dark:bg-[var(--color-dark)]',
         GeistSans.variable,
@@ -104,8 +105,8 @@ export default function RootLayout({
                   }
                   
                   const storedTheme = getCookie('selectedTheme');
-                  if (storedTheme && document.documentElement) {
-                    document.documentElement.setAttribute('data-theme', storedTheme);
+                  if (document.documentElement) {
+                    document.documentElement.setAttribute('data-theme', storedTheme || 'theme5');
                   }
                 } catch (e) {
                   // Ignore errors in case of CSP or other restrictions

@@ -1,5 +1,5 @@
 html[data-theme="theme1"] {
     --color-dark: #9E2B25;
     --color-light: #FFF8F0;
-    --color-light-80: #FFF8F0BF;
+    --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
 }

@@ -26,12 +26,10 @@ export const changeTheme = (theme: string) => {
 }
 
 export const getStoredTheme = (): string => {
-  return getCookie('selectedTheme') || ''
+  return getCookie('selectedTheme') || 'theme5'
 }
 
 export const applyStoredTheme = () => {
   const storedTheme = getStoredTheme()
-  if (storedTheme) {
-    document.querySelector('html')?.setAttribute('data-theme', storedTheme)
-  }
+  document.querySelector('html')?.setAttribute('data-theme', storedTheme)
 }
