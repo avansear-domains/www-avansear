@@ -54,16 +54,23 @@ export function CursorProvider({ children }: { children: ReactNode }) {
 
     // Add keyboard event listener for Ctrl+Shift+Space
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.shiftKey && event.code === 'Space') {
+      // Check for Ctrl+Shift+Space using both code and key for better compatibility
+      if (
+        event.ctrlKey && 
+        event.shiftKey && 
+        (event.code === 'Space' || event.key === ' ' || event.keyCode === 32)
+      ) {
         event.preventDefault()
+        event.stopPropagation()
         toggleCursor()
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown)
+    // Use capture phase to catch the event early
+    document.addEventListener('keydown', handleKeyDown, true)
     
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keydown', handleKeyDown, true)
     }
   }, [toggleCursor, updateCursorClass])
 

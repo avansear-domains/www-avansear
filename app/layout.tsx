@@ -120,7 +120,7 @@ export default function RootLayout({
         <CursorProvider>
           <CustomCursor />
           <CursorHint />
-          <main className="flex-auto min-w-0 mt-8 flex flex-col px-2 md:px-0">
+          <main className="flex-auto min-w-0 mt-8 flex flex-col px-4">
             <Navbar />
             {children}
             <Footer />

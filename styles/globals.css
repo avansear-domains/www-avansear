@@ -37,3 +37,16 @@
     --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
   }
 }
+
+@keyframes spin-disc {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning-disc {
+  animation: spin-disc 8s linear infinite;
+}
