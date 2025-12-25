@@ -74,6 +74,7 @@ export async function GET() {
 
     const lastFmApiKey = process.env.LASTFM_API_KEY
     if (!lastFmApiKey) {
+      console.warn('LASTFM_API_KEY not found in environment variables - album art will not be fetched')
       return NextResponse.json({
         songName: latestSong.songName,
         artist: latestSong.artist,
