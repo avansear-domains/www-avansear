@@ -20,7 +20,7 @@ export default async function MusixPage() {
           song of the week
         </AnimatedHeading>
         <p className="text-[var(--color-dark)] dark:text-[var(--color-light)]">
-          you have to click for the audio to play coz of browser conventions u_u
+          you have to interact for the audio to play coz of browser conventions u_u
         </p>
       </div>
       
