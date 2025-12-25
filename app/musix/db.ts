@@ -4,7 +4,8 @@ export interface ArchivedSong {
   week: string
   songName: string
   artist: string
-  youtubeId: string
+  youtubeId?: string
+  spotifyTrackId?: string
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -19,7 +20,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 export async function getArchivedSongs(): Promise<ArchivedSong[]> {
   const { data, error } = await supabase
     .from('musix_songs')
-    .select('week, song_name, artist, youtube_id')
+    .select('week, song_name, artist, youtube_id, spotify_track_id')
     .order('week', { ascending: false })
 
   if (error) {
@@ -32,6 +33,7 @@ export async function getArchivedSongs(): Promise<ArchivedSong[]> {
     songName: song.song_name,
     artist: song.artist,
     youtubeId: song.youtube_id,
+    spotifyTrackId: song.spotify_track_id,
   }))
 }
 
@@ -39,13 +41,15 @@ export async function addSong(song: {
   week: string
   songName: string
   artist: string
-  youtubeId: string
+  youtubeId?: string
+  spotifyTrackId?: string
 }): Promise<boolean> {
   const { error } = await supabase.from('musix_songs').insert({
     week: song.week,
     song_name: song.songName,
     artist: song.artist,
-    youtube_id: song.youtubeId,
+    youtube_id: song.youtubeId || null,
+    spotify_track_id: song.spotifyTrackId || null,
   })
 
   if (error) {
@@ -71,6 +75,20 @@ export async function songExists(youtubeId: string): Promise<boolean> {
   return !!data
 }
 
+export async function updateSongYoutubeId(spotifyTrackId: string, youtubeId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('musix_songs')
+    .update({ youtube_id: youtubeId })
+    .eq('spotify_track_id', spotifyTrackId)
+
+  if (error) {
+    console.error('Error updating YouTube ID:', error)
+    return false
+  }
+
+  return true
+}
+
 export async function getMaxWeek(): Promise<number> {
   const { data, error } = await supabase
     .from('musix_songs')
@@ -85,5 +103,56 @@ export async function getMaxWeek(): Promise<number> {
 
   const weekNum = parseInt(data.week.replace(/\D/g, ''))
   return weekNum || 0
+}
+
+export async function getExistingSongs(): Promise<{
+  songsById: Record<string, { week: string; songName: string; artist: string; spotifyTrackId?: string }>
+  songsByNameArtist: Record<string, { week: string; songName: string; artist: string; spotifyTrackId?: string }>
+  maxWeek: number
+}> {
+  const { data, error } = await supabase
+    .from('musix_songs')
+    .select('spotify_track_id, week, song_name, artist')
+
+  if (error) {
+    console.error('Error fetching existing songs:', error)
+    return { songsById: {}, songsByNameArtist: {}, maxWeek: 0 }
+  }
+
+  const songsById: Record<string, { week: string; songName: string; artist: string; spotifyTrackId?: string }> = {}
+  const songsByNameArtist: Record<string, { week: string; songName: string; artist: string; spotifyTrackId?: string }> = {}
+  let maxWeek = 0
+
+  for (const song of data || []) {
+    const spotifyTrackId = song.spotify_track_id
+    if (!spotifyTrackId) continue // Skip songs without Spotify ID
+    
+    const week = song.week
+    const songName = song.song_name
+    const artist = song.artist
+
+    songsById[spotifyTrackId] = {
+      week,
+      songName,
+      artist,
+      spotifyTrackId,
+    }
+
+    // Track by normalized song name + artist (case-insensitive)
+    const normalizedKey = `${songName.toLowerCase().trim()}|${artist.toLowerCase().trim()}`
+    songsByNameArtist[normalizedKey] = {
+      week,
+      songName,
+      artist,
+      spotifyTrackId,
+    }
+
+    // Extract week number
+    const weekMatch = week.match(/\d+/)
+    const weekNum = weekMatch ? parseInt(weekMatch[0]) : 0
+    maxWeek = Math.max(maxWeek, weekNum)
+  }
+
+  return { songsById, songsByNameArtist, maxWeek }
 }
 

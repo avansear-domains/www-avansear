@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { AnimatedHeading } from '../components/animated-heading'
 import { FetchSongsTrigger } from '../components/fetch-songs-trigger'
+import { SpinningDisc } from '../components/spinning-disc'
+import { BackgroundAudio } from '../components/background-audio'
 import { getArchivedSongs } from './db'
 
 export const metadata: Metadata = {
@@ -19,31 +21,26 @@ export default async function MusixPage() {
         <AnimatedHeading className="title font-semibold text-2xl tracking-tighter">
           song of the week
         </AnimatedHeading>
+        <p className="text-[var(--color-dark)] dark:text-[var(--color-light)]">
+          you have to click for the audio to play coz of browser conventions u_u
+        </p>
       </div>
       
-      {latestSong ? (
-        <div className="w-full">
-          <iframe 
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${latestSong.youtubeId}?&autoplay=1&controls=0&color=white&rel=0`}
-            style={{ borderRadius: '12px', aspectRatio: '1/1' }}
-          />
-        </div>
-      ) : (
-        <div className="w-full aspect-square flex items-center justify-center border border-gray-300 rounded-xl">
-          <p className="text-gray-500">No songs yet. Fetching from playlist...</p>
-        </div>
-      )}
+      <BackgroundAudio />
+      <SpinningDisc />
 
       <div className="mt-16">
         <h2 className="text-xl font-semibold mb-6">weekly archive</h2>
         <div>
           {archivedSongs.map((song) => (
             <a
-              key={song.youtubeId}
+              key={song.spotifyTrackId || song.youtubeId}
               className="flex flex-col space-y-1 mb-4"
-              href={`https://www.youtube.com/watch?v=${song.youtubeId}`}
+              href={song.spotifyTrackId 
+                ? `https://open.spotify.com/track/${song.spotifyTrackId}`
+                : song.youtubeId 
+                ? `https://open.spotify.com/search/${encodeURIComponent(song.songName + ' ' + song.artist)}`
+                : '#'}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -8,25 +8,10 @@ import { SpinningDisc } from 'app/components/spinning-disc'
 
 export default function Page() {
   const [isHovered, setIsHovered] = useState(false)
-  const [youtubeId, setYoutubeId] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Fetch latest song on mount
-    fetch('/api/musix/latest-song')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.youtubeId) {
-          setYoutubeId(data.youtubeId)
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch latest song:', err)
-      })
-  }, [])
 
   return (
     <section>
-      <BackgroundAudio youtubeId={youtubeId} />
+      <BackgroundAudio />
       <div className="p-4 -m-4">
         <AnimatedHeading 
           className="mb-4 sm:mb-8 text-2xl font-semibold tracking-tighter"

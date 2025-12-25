@@ -7,13 +7,25 @@ export async function GET() {
     const latestSong = songs.length > 0 ? songs[0] : null
     
     if (!latestSong) {
-      return NextResponse.json({ youtubeId: null })
+      return NextResponse.json({ 
+        songName: null, 
+        artist: null,
+        spotifyTrackId: null 
+      })
     }
     
-    return NextResponse.json({ youtubeId: latestSong.youtubeId })
+    return NextResponse.json({ 
+      songName: latestSong.songName,
+      artist: latestSong.artist,
+      spotifyTrackId: latestSong.spotifyTrackId || null
+    })
   } catch (error) {
     console.error('Error fetching latest song:', error)
-    return NextResponse.json({ youtubeId: null }, { status: 500 })
+    return NextResponse.json({ 
+      songName: null, 
+      artist: null,
+      spotifyTrackId: null 
+    }, { status: 500 })
   }
 }
 
