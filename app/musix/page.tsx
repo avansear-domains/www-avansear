@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import { AnimatedHeading } from '../components/animated-heading'
-import { FetchSongsTrigger } from '../components/fetch-songs-trigger'
 import { SpinningDisc } from '../components/spinning-disc'
 import { BackgroundAudio } from '../components/background-audio'
 import { getArchivedSongs } from './db'
@@ -16,7 +15,6 @@ export default async function MusixPage() {
 
   return (
     <section>
-      <FetchSongsTrigger />
       <div className="mb-8">
         <AnimatedHeading className="title font-semibold text-2xl tracking-tighter">
           song of the week

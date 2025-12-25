@@ -15,7 +15,13 @@ export function SpinningDisc() {
 
   useEffect(() => {
     fetch('/api/musix/album-art')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          console.error('Failed to fetch album art:', res.status, res.statusText)
+          return { songName: null, artist: null, albumArt: null, albumName: null }
+        }
+        return res.json()
+      })
       .then((data) => {
         if (data.songName) {
           setAlbumInfo(data)

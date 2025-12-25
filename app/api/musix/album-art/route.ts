@@ -2,7 +2,7 @@ import { getArchivedSongs } from '../../../musix/db'
 import { NextResponse } from 'next/server'
 
 interface LastFmTrackInfo {
-  track: {
+  track?: {
     name: string
     artist: {
       name: string
@@ -12,6 +12,8 @@ interface LastFmTrackInfo {
       image: Array<{ '#text': string; size: string }>
     }
   }
+  error?: number
+  message?: string
 }
 
 async function getLastFmAlbumArt(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null }> {
@@ -27,10 +29,17 @@ async function getLastFmAlbumArt(apiKey: string, songName: string, artist: strin
     const response = await fetch(`https://ws.audioscrobbler.com/2.0/?${params}`)
 
     if (!response.ok) {
+      console.error('Last.fm API returned non-OK status:', response.status)
       return { albumArt: null, albumName: null }
     }
 
     const data: LastFmTrackInfo = await response.json()
+
+    // Check for Last.fm API errors (they return 200 with error in JSON)
+    if (data.error) {
+      console.error('Last.fm API error:', data.error, data.message)
+      return { albumArt: null, albumName: null }
+    }
 
     if (data.track?.album?.image) {
       // Get the largest image (usually the last one in the array)
@@ -74,12 +83,15 @@ export async function GET() {
     }
 
     // Get album art from Last.fm
+    // getLastFmAlbumArt handles errors gracefully and returns null values
     const { albumArt, albumName } = await getLastFmAlbumArt(
       lastFmApiKey,
       latestSong.songName,
       latestSong.artist
     )
     
+    // Always return 200 with song info, even if album art is null
+    // This prevents Last.fm errors from causing 500 responses
     return NextResponse.json({
       songName: latestSong.songName,
       artist: latestSong.artist,
@@ -87,12 +99,13 @@ export async function GET() {
       albumName: albumName,
     })
   } catch (error) {
-    console.error('Error fetching album art:', error)
+    // Only catch database errors here - Last.fm errors are handled in getLastFmAlbumArt
+    console.error('Error fetching album art (database error):', error)
     return NextResponse.json({ 
       songName: null, 
       artist: null, 
       albumArt: null,
       albumName: null
-    }, { status: 500 })
+    })
   }
 }
