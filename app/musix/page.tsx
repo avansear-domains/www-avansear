@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { AnimatedHeading } from '../components/animated-heading'
 import { SpinningDisc } from '../components/spinning-disc'
 import { BackgroundAudio } from '../components/background-audio'
+import { FetchSongsTrigger } from '../components/fetch-songs-trigger'
 import { getArchivedSongs } from './db'
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default async function MusixPage() {
         </p>
       </div>
       
+      <FetchSongsTrigger />
       <BackgroundAudio />
       <SpinningDisc />
 

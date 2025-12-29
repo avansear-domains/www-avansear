@@ -145,7 +145,9 @@ async function fetchAndAddSongs(clientId: string, clientSecret: string, playlist
 
     // Get existing songs from database
     const { songsById, songsByNameArtist, maxWeek } = await getExistingSongs()
-    output.push(`Found ${Object.keys(songsById).length} existing songs in database (max week: ${maxWeek})`)
+    output.push(`Found ${Object.keys(songsById).length} existing songs with Spotify IDs in database`)
+    output.push(`Found ${Object.keys(songsByNameArtist).length} total unique songs (by name+artist) in database`)
+    output.push(`Max week number: ${maxWeek}`)
 
     // Process playlist tracks in order they appear in playlist
     let newSongsCount = 0

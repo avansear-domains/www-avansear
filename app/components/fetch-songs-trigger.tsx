@@ -6,12 +6,16 @@ import { useRouter } from 'next/navigation'
 export function FetchSongsTrigger() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error' | 'rate-limited'>('idle')
   const [message, setMessage] = useState<string>('')
+  const [output, setOutput] = useState<string>('')
+  const [showDetails, setShowDetails] = useState(false)
   const router = useRouter()
 
   async function fetchSongs() {
     try {
       setStatus('loading')
       setMessage('Fetching songs from playlist...')
+      setOutput('')
+      setShowDetails(false)
       const response = await fetch('/api/musix/fetch-songs')
       const data = await response.json()
 
@@ -24,11 +28,23 @@ export function FetchSongsTrigger() {
       if (!response.ok || !data.success) {
         setStatus('error')
         setMessage(data.message || 'Failed to fetch songs')
+        if (data.output) {
+          setOutput(data.output)
+          setShowDetails(true)
+        }
+        if (data.error) {
+          setOutput((data.output || '') + '\n\nError: ' + data.error)
+          setShowDetails(true)
+        }
         return
       }
 
       setStatus('success')
       setMessage(data.message || 'Songs updated successfully')
+      if (data.output) {
+        setOutput(data.output)
+        setShowDetails(true)
+      }
       
       // Ensure latest song has YouTube ID for playback
       try {
@@ -41,14 +57,18 @@ export function FetchSongsTrigger() {
       // Refresh the page to show new songs
       router.refresh()
       
-      // Clear message after 3 seconds
+      // Clear message after 10 seconds (longer to see details)
       setTimeout(() => {
         setStatus('idle')
         setMessage('')
-      }, 3000)
+        setOutput('')
+        setShowDetails(false)
+      }, 10000)
     } catch (error) {
       setStatus('error')
       setMessage('Failed to fetch songs')
+      setOutput(error instanceof Error ? error.message : 'Unknown error')
+      setShowDetails(true)
     }
   }
 
@@ -56,34 +76,40 @@ export function FetchSongsTrigger() {
     fetchSongs()
   }, [])
 
-  if (status === 'idle' && !message) {
+  // Only show UI for errors or rate limiting, hide success/loading states
+  if (status === 'idle' || status === 'loading' || status === 'success') {
     return null
   }
 
   return (
     <div className="mb-4 p-3 rounded-lg border text-sm">
-      {status === 'loading' && (
-        <div className="flex items-center gap-2">
-          <span className="animate-spin">⏳</span>
-          <span>{message}</span>
-        </div>
-      )}
-      {status === 'success' && (
-        <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-          <span>✓</span>
-          <span>{message}</span>
-        </div>
-      )}
       {status === 'error' && (
-        <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-          <span>✗</span>
-          <span>{message}</span>
-          <button
-            onClick={fetchSongs}
-            className="ml-2 underline hover:no-underline"
-          >
-            Retry
-          </button>
+        <div>
+          <div className="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2">
+            <span>✗</span>
+            <span>{message}</span>
+            <button
+              onClick={fetchSongs}
+              className="ml-2 underline hover:no-underline"
+            >
+              Retry
+            </button>
+          </div>
+          {output && (
+            <div>
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="text-xs underline hover:no-underline mb-2"
+              >
+                {showDetails ? 'Hide' : 'Show'} details
+              </button>
+              {showDetails && (
+                <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2 overflow-auto max-h-96 whitespace-pre-wrap">
+                  {output}
+                </pre>
+              )}
+            </div>
+          )}
         </div>
       )}
       {status === 'rate-limited' && (
@@ -91,14 +117,6 @@ export function FetchSongsTrigger() {
           <span>⚠</span>
           <span>{message}</span>
         </div>
-      )}
-      {status !== 'loading' && (
-        <button
-          onClick={fetchSongs}
-          className="mt-2 text-xs underline hover:no-underline"
-        >
-          Refresh songs
-        </button>
       )}
     </div>
   )

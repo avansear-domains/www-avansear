@@ -125,29 +125,34 @@ export async function getExistingSongs(): Promise<{
 
   for (const song of data || []) {
     const spotifyTrackId = song.spotify_track_id
-    if (!spotifyTrackId) continue // Skip songs without Spotify ID
-    
     const week = song.week
     const songName = song.song_name
     const artist = song.artist
 
-    songsById[spotifyTrackId] = {
-      week,
-      songName,
-      artist,
-      spotifyTrackId,
+    // Only add to songsById if it has a Spotify track ID (for Spotify ID-based duplicate checking)
+    if (spotifyTrackId) {
+      songsById[spotifyTrackId] = {
+        week,
+        songName,
+        artist,
+        spotifyTrackId,
+      }
     }
 
-    // Track by normalized song name + artist (case-insensitive)
+    // Track ALL songs by normalized song name + artist (case-insensitive) for duplicate checking
+    // This ensures we catch duplicates even if they were added via the old Python script
     const normalizedKey = `${songName.toLowerCase().trim()}|${artist.toLowerCase().trim()}`
-    songsByNameArtist[normalizedKey] = {
-      week,
-      songName,
-      artist,
-      spotifyTrackId,
+    // Only overwrite if this entry doesn't exist, or if this one has a Spotify ID (prefer entries with Spotify IDs)
+    if (!songsByNameArtist[normalizedKey] || spotifyTrackId) {
+      songsByNameArtist[normalizedKey] = {
+        week,
+        songName,
+        artist,
+        spotifyTrackId: spotifyTrackId || undefined,
+      }
     }
 
-    // Extract week number
+    // Extract week number from ALL songs to get accurate maxWeek
     const weekMatch = week.match(/\d+/)
     const weekNum = weekMatch ? parseInt(weekMatch[0]) : 0
     maxWeek = Math.max(maxWeek, weekNum)
