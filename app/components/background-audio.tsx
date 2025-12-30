@@ -162,11 +162,13 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
           },
           onStateChange: (event: YT.OnStateChangeEvent) => {
             console.log('BackgroundAudio: Player state changed:', event.data)
-            // Handle state changes if needed
+            // Only spin disc when playing AND unmuted (after user interaction)
             if (event.data === YT.PlayerState.PLAYING && hasInteractedRef.current) {
-              console.log('BackgroundAudio: Unmuting after user interaction')
-              // Unmute after user interaction
-              event.target.unMute()
+              // Playing and unmuted - spin the disc
+              window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
+            } else {
+              // Not playing, or playing but muted - don't spin
+              window.dispatchEvent(new CustomEvent('audioPlaying', { detail: false }))
             }
           },
           onError: (event: YT.PlayerEvent) => {
@@ -182,8 +184,38 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
         hasInteractedRef.current = true
         try {
           playerRef.current.unMute()
+          // Ensure it's playing
+          if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
+            playerRef.current.playVideo()
+          }
+          // Check if already playing and dispatch event
+          if (playerRef.current.getPlayerState() === YT.PlayerState.PLAYING) {
+            window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
+          }
         } catch (e) {
           console.error('Failed to unmute:', e)
+        }
+      }
+    }
+
+    // Handle explicit play button click
+    const handleTriggerPlay = () => {
+      if (isReadyRef.current && playerRef.current) {
+        hasInteractedRef.current = true
+        try {
+          // Unmute and play
+          playerRef.current.unMute()
+          if (playerRef.current.getPlayerState() !== YT.PlayerState.PLAYING) {
+            playerRef.current.playVideo()
+          }
+          // Dispatch playing state
+          setTimeout(() => {
+            if (playerRef.current && playerRef.current.getPlayerState() === YT.PlayerState.PLAYING) {
+              window.dispatchEvent(new CustomEvent('audioPlaying', { detail: true }))
+            }
+          }, 100)
+        } catch (e) {
+          console.error('Failed to play audio:', e)
         }
       }
     }
@@ -194,11 +226,15 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
       window.addEventListener(event, handleInteraction, { once: true })
     })
 
+    // Listen for explicit play button trigger
+    window.addEventListener('triggerAudioPlay', handleTriggerPlay)
+
     return () => {
       if (checkYT) clearInterval(checkYT)
       events.forEach((event) => {
         window.removeEventListener(event, handleInteraction)
       })
+      window.removeEventListener('triggerAudioPlay', handleTriggerPlay)
       if (playerRef.current) {
         try {
           playerRef.current.destroy()

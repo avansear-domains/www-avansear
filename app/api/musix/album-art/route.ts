@@ -69,7 +69,7 @@ export async function GET() {
         artist: null, 
         albumArt: null,
         albumName: null
-      })
+      }, { status: 200 })
     }
 
     const lastFmApiKey = process.env.LASTFM_API_KEY
@@ -80,7 +80,7 @@ export async function GET() {
         artist: latestSong.artist,
         albumArt: null,
         albumName: null,
-      })
+      }, { status: 200 })
     }
 
     // Get album art from Last.fm
@@ -98,7 +98,7 @@ export async function GET() {
       artist: latestSong.artist,
       albumArt: albumArt,
       albumName: albumName,
-    })
+    }, { status: 200 })
   } catch (error) {
     // Only catch database errors here - Last.fm errors are handled in getLastFmAlbumArt
     console.error('Error fetching album art (database error):', error)
@@ -107,6 +107,6 @@ export async function GET() {
       artist: null, 
       albumArt: null,
       albumName: null
-    })
+    }, { status: 200 })
   }
 }
