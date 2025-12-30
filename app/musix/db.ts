@@ -161,3 +161,40 @@ export async function getExistingSongs(): Promise<{
   return { songsById, songsByNameArtist, maxWeek }
 }
 
+export async function getRateLimitExecutions(): Promise<number[]> {
+  const { data, error } = await supabase
+    .from('musix_rate_limit')
+    .select('executed_at')
+    .order('executed_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching rate limit executions:', error)
+    return []
+  }
+
+  return (data || []).map((row: { executed_at: string }) => new Date(row.executed_at).getTime())
+}
+
+export async function addRateLimitExecution(): Promise<void> {
+  const { error } = await supabase
+    .from('musix_rate_limit')
+    .insert({ executed_at: new Date().toISOString() })
+
+  if (error) {
+    console.error('Error recording rate limit execution:', error)
+  }
+}
+
+export async function cleanOldRateLimitExecutions(windowHours: number): Promise<void> {
+  const cutoffTime = new Date(Date.now() - windowHours * 60 * 60 * 1000).toISOString()
+  
+  const { error } = await supabase
+    .from('musix_rate_limit')
+    .delete()
+    .lt('executed_at', cutoffTime)
+
+  if (error) {
+    console.error('Error cleaning old rate limit executions:', error)
+  }
+}
+

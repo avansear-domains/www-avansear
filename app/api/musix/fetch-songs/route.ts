@@ -1,43 +1,8 @@
-import { writeFile, readFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import { join } from 'path'
-import { getExistingSongs, addSong } from '../../../musix/db'
+import { getExistingSongs, addSong, getRateLimitExecutions, addRateLimitExecution, cleanOldRateLimitExecutions } from '../../../musix/db'
 
-const RATE_LIMIT_FILE = join(process.cwd(), '.data', 'musix-rate-limit.json')
 const MAX_EXECUTIONS = 50
 const WINDOW_HOURS = 24
 const SPOTIFY_PLAYLIST_ID = process.env.SPOTIFY_PLAYLIST_ID || '2vKyMZ7DVsdjn8YQ7iCgJP'
-
-interface RateLimitData {
-  executions: number[]
-}
-
-async function ensureDataDir() {
-  const dataDir = join(process.cwd(), '.data')
-  if (!existsSync(dataDir)) {
-    await mkdir(dataDir, { recursive: true })
-  }
-}
-
-async function getRateLimitData(): Promise<RateLimitData> {
-  await ensureDataDir()
-  
-  if (!existsSync(RATE_LIMIT_FILE)) {
-    return { executions: [] }
-  }
-  
-  try {
-    const content = await readFile(RATE_LIMIT_FILE, 'utf-8')
-    return JSON.parse(content)
-  } catch {
-    return { executions: [] }
-  }
-}
-
-async function saveRateLimitData(data: RateLimitData) {
-  await ensureDataDir()
-  await writeFile(RATE_LIMIT_FILE, JSON.stringify(data, null, 2))
-}
 
 function cleanOldExecutions(executions: number[]): number[] {
   const now = Date.now()
@@ -46,8 +11,12 @@ function cleanOldExecutions(executions: number[]): number[] {
 }
 
 async function checkRateLimit(): Promise<{ allowed: boolean; remaining: number }> {
-  const data = await getRateLimitData()
-  const cleanedExecutions = cleanOldExecutions(data.executions)
+  // Clean old executions first
+  await cleanOldRateLimitExecutions(WINDOW_HOURS)
+  
+  // Get current executions
+  const executions = await getRateLimitExecutions()
+  const cleanedExecutions = cleanOldExecutions(executions)
   
   if (cleanedExecutions.length >= MAX_EXECUTIONS) {
     return { allowed: false, remaining: 0 }
@@ -57,10 +26,7 @@ async function checkRateLimit(): Promise<{ allowed: boolean; remaining: number }
 }
 
 async function recordExecution() {
-  const data = await getRateLimitData()
-  const cleanedExecutions = cleanOldExecutions(data.executions)
-  cleanedExecutions.push(Date.now())
-  await saveRateLimitData({ executions: cleanedExecutions })
+  await addRateLimitExecution()
 }
 
 interface SpotifyTokenResponse {
