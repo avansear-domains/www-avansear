@@ -29,7 +29,7 @@ export default async function MusixPage() {
       <BackgroundAudio />
       <SpinningDisc />
 
-      <div className="mt-16">
+      <div className="mt-8">
         <h2 className="text-xl font-semibold mb-6">weekly archive</h2>
         <div>
           {archivedSongs.map((song) => (
