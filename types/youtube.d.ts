@@ -47,6 +47,7 @@ declare namespace YT {
     getVolume(): number
     seekTo(seconds: number, allowSeekAhead?: boolean): void
     getCurrentTime(): number
+    getPlayerState(): number
     destroy(): void
   }
 
