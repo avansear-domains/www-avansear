@@ -8,7 +8,6 @@
 
 @layer base {
   html {
-    user-select: none;
     min-height: 100vh;
     overflow-x: hidden;
     /* Hide scrollbar for Firefox */
@@ -35,6 +34,17 @@
     --color-dark: #0C0C0C;
     --color-light: #eeeeee;
     --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
+  }
+
+  /* Custom text selection colors */
+  ::selection {
+    background-color: var(--color-light);
+    color: var(--color-dark);
+  }
+
+  ::-moz-selection {
+    background-color: var(--color-light);
+    color: var(--color-dark);
   }
 }
 
