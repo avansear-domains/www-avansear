@@ -220,14 +220,28 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
       }
     }
 
+    // Handle explicit pause button click
+    const handleTriggerPause = () => {
+      if (isReadyRef.current && playerRef.current) {
+        try {
+          playerRef.current.pauseVideo()
+          // Dispatch paused state immediately
+          window.dispatchEvent(new CustomEvent('audioPlaying', { detail: false }))
+        } catch (e) {
+          console.error('Failed to pause audio:', e)
+        }
+      }
+    }
+
     // Add event listeners for user interaction
     const events = ['click', 'touchstart', 'keydown', 'scroll']
     events.forEach((event) => {
       window.addEventListener(event, handleInteraction, { once: true })
     })
 
-    // Listen for explicit play button trigger
+    // Listen for explicit play/pause button triggers
     window.addEventListener('triggerAudioPlay', handleTriggerPlay)
+    window.addEventListener('triggerAudioPause', handleTriggerPause)
 
     return () => {
       if (checkYT) clearInterval(checkYT)
@@ -235,6 +249,7 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
         window.removeEventListener(event, handleInteraction)
       })
       window.removeEventListener('triggerAudioPlay', handleTriggerPlay)
+      window.removeEventListener('triggerAudioPause', handleTriggerPause)
       if (playerRef.current) {
         try {
           playerRef.current.destroy()

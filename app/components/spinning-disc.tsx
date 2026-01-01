@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Play } from 'lucide-react'
 
 interface AlbumInfo {
@@ -14,6 +14,10 @@ export function SpinningDisc() {
   const [albumInfo, setAlbumInfo] = useState<AlbumInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isPlaying, setIsPlaying] = useState(false)
+  const discRef = useRef<HTMLButtonElement>(null)
+  const rotationRef = useRef<number>(0)
+  const animationStartTimeRef = useRef<number | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
 
   useEffect(() => {
     fetch('/api/musix/album-art')
@@ -38,6 +42,57 @@ export function SpinningDisc() {
       })
   }, [])
 
+  // Track rotation angle when playing
+  useEffect(() => {
+    if (!discRef.current) return
+
+    if (isPlaying) {
+      // Start/resume animation from current rotation
+      const startRotation = rotationRef.current
+      // Calculate what time would produce the current rotation (8s per full rotation)
+      animationStartTimeRef.current = performance.now() - (startRotation / 360) * 8000
+      
+      const updateRotation = () => {
+        if (!discRef.current || !animationStartTimeRef.current) return
+        
+        const elapsed = performance.now() - animationStartTimeRef.current
+        // Calculate rotation: elapsed time / 8s * 360 degrees, normalized to 0-360
+        rotationRef.current = (elapsed / 8000) * 360 % 360
+        
+        discRef.current.style.transform = `rotate(${rotationRef.current}deg)`
+        animationFrameRef.current = requestAnimationFrame(updateRotation)
+      }
+      
+      animationFrameRef.current = requestAnimationFrame(updateRotation)
+    } else {
+      // Pause animation - preserve current rotation
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
+      
+      // Capture current rotation from computed style
+      if (discRef.current) {
+        const computedStyle = window.getComputedStyle(discRef.current)
+        const matrix = computedStyle.transform
+        if (matrix && matrix !== 'none') {
+          const values = matrix.split('(')[1].split(')')[0].split(',')
+          const a = parseFloat(values[0])
+          const b = parseFloat(values[1])
+          const angle = Math.round(Math.atan2(b, a) * (180 / Math.PI))
+          rotationRef.current = angle < 0 ? angle + 360 : angle
+          discRef.current.style.transform = `rotate(${rotationRef.current}deg)`
+        }
+      }
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [isPlaying])
+
   // Listen for audio playing state changes
   useEffect(() => {
     const handleAudioPlaying = (event: CustomEvent<boolean>) => {
@@ -51,12 +106,17 @@ export function SpinningDisc() {
     }
   }, [])
 
-  // Handle play button click
+  // Handle play/pause button click
   const handlePlayClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Dispatch event to trigger audio playback
-    window.dispatchEvent(new CustomEvent('triggerAudioPlay'))
+    if (isPlaying) {
+      // If playing, pause the audio
+      window.dispatchEvent(new CustomEvent('triggerAudioPause'))
+    } else {
+      // If not playing, start playback
+      window.dispatchEvent(new CustomEvent('triggerAudioPlay'))
+    }
   }
 
   if (isLoading) {
@@ -76,11 +136,13 @@ export function SpinningDisc() {
       {/* Spinning Disc */}
       <div className="relative flex-shrink-0">
         <button
+          ref={discRef}
           type="button"
           onClick={handlePlayClick}
-          className={`${isPlaying ? 'spinning-disc' : ''} relative rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center overflow-hidden shadow-lg transition-transform focus:outline-none hover:opacity-90 active:opacity-80`}
+          className="relative rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center overflow-hidden shadow-lg focus:outline-none hover:opacity-90 active:opacity-80"
           style={{ width: '100px', height: '100px' }}
-          aria-label={isPlaying ? 'Audio playing' : 'Play song'}
+          aria-label={isPlaying ? 'Pause song' : 'Play song'}
+          title="click to play/pause"
         >
           {albumInfo.albumArt ? (
             <div className="relative w-full h-full">
