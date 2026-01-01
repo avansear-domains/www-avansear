@@ -137,12 +137,103 @@ async function tryTrackGetInfo(apiKey: string, songName: string, artist: string)
   return { albumArt, albumName, success: true }
 }
 
+async function tryAlbumGetInfo(apiKey: string, albumName: string, artist: string): Promise<{ albumArt: string | null; success: boolean }> {
+  const params = new URLSearchParams({
+    method: 'album.getInfo',
+    api_key: apiKey,
+    artist: artist,
+    album: albumName,
+    format: 'json',
+  })
+
+  const url = `https://ws.audioscrobbler.com/2.0/?${params}`
+  console.log('Last.fm API request (album.getInfo):', { albumName, artist, url: url.replace(apiKey, 'REDACTED') })
+  
+  try {
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      console.error('Last.fm album.getInfo returned non-OK status:', response.status, response.statusText)
+      return { albumArt: null, success: false }
+    }
+
+    const data: any = await response.json()
+    
+    if (data.error) {
+      console.error('Last.fm album.getInfo API error:', data.error, data.message)
+      return { albumArt: null, success: false }
+    }
+
+    if (!data.album) {
+      console.warn('Last.fm album.getInfo: No album data found')
+      return { albumArt: null, success: false }
+    }
+
+    const images = data.album.image || []
+    console.log('Last.fm album.getInfo: Found images:', {
+      imageCount: images.length,
+      imageSizes: images.map((img: any, idx: number) => ({ 
+        index: idx, 
+        size: img.size, 
+        hasUrl: !!img['#text'], 
+        urlLength: img['#text']?.length || 0,
+        isEmpty: !img['#text'] || img['#text'].trim() === ''
+      })),
+    })
+
+    // Try to find a valid image URL from largest to smallest
+    let albumArtUrl: string | null = null
+    for (let i = images.length - 1; i >= 0; i--) {
+      const img = images[i]
+      const url = img?.['#text']
+      if (url && url.trim() !== '') {
+        albumArtUrl = url
+        console.log('Last.fm album.getInfo: Found valid image URL:', {
+          imageIndex: i,
+          imageSize: img?.size,
+          urlPreview: url.substring(0, 50),
+        })
+        break
+      }
+    }
+
+    const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
+    return { albumArt, success: !!albumArt }
+  } catch (error) {
+    console.error('Error in Last.fm album.getInfo:', error)
+    return { albumArt: null, success: false }
+  }
+}
+
 async function getLastFmAlbumArt(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null }> {
   try {
     // Try with full artist name first
     let result = await tryTrackGetInfo(apiKey, songName, artist)
-    if (result.success && (result.albumArt || result.albumName)) {
+    if (result.success && result.albumArt) {
+      // Got album art, return it
       return { albumArt: result.albumArt, albumName: result.albumName }
+    }
+    
+    // If we got album name but no art, try album.getInfo
+    if (result.success && result.albumName && !result.albumArt) {
+      console.log('Got album name but no art, trying album.getInfo:', result.albumName)
+      const albumResult = await tryAlbumGetInfo(apiKey, result.albumName, artist)
+      if (albumResult.success && albumResult.albumArt) {
+        return { albumArt: albumResult.albumArt, albumName: result.albumName }
+      }
+      
+      // If artist has a comma, try with just the first artist
+      if (artist.includes(',')) {
+        const firstArtist = artist.split(',')[0].trim()
+        console.log('Trying album.getInfo with first artist only:', firstArtist)
+        const albumResultFirst = await tryAlbumGetInfo(apiKey, result.albumName, firstArtist)
+        if (albumResultFirst.success && albumResultFirst.albumArt) {
+          return { albumArt: albumResultFirst.albumArt, albumName: result.albumName }
+        }
+      }
+      
+      // Still return album name even if we couldn't get art
+      return { albumArt: null, albumName: result.albumName }
     }
 
     // If that fails and artist has a comma, try with just the first artist
@@ -150,8 +241,21 @@ async function getLastFmAlbumArt(apiKey: string, songName: string, artist: strin
       const firstArtist = artist.split(',')[0].trim()
       console.log('Trying with first artist only:', firstArtist)
       result = await tryTrackGetInfo(apiKey, songName, firstArtist)
-      if (result.success && (result.albumArt || result.albumName)) {
+      if (result.success && result.albumArt) {
         return { albumArt: result.albumArt, albumName: result.albumName }
+      }
+      
+      // If we got album name but no art, try album.getInfo
+      if (result.success && result.albumName && !result.albumArt) {
+        console.log('Got album name but no art (first artist), trying album.getInfo:', result.albumName)
+        const albumResult = await tryAlbumGetInfo(apiKey, result.albumName, firstArtist)
+        if (albumResult.success && albumResult.albumArt) {
+          return { albumArt: albumResult.albumArt, albumName: result.albumName }
+        }
+      }
+      
+      if (result.success && result.albumName) {
+        return { albumArt: null, albumName: result.albumName }
       }
     }
 

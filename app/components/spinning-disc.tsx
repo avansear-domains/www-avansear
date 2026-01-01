@@ -34,8 +34,10 @@ export function SpinningDisc() {
           songName: data?.songName,
           artist: data?.artist,
           albumName: data?.albumName,
-          albumArt: data?.albumArt ? `${data.albumArt.substring(0, 50)}...` : 'null',
+          albumArt: data?.albumArt ? `${data.albumArt.substring(0, 50)}...` : null,
           hasAlbumArt: !!data?.albumArt,
+          albumArtType: typeof data?.albumArt,
+          albumArtValue: data?.albumArt,
         })
         if (data && data.songName) {
           setAlbumInfo(data)
