@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description: 'song of the week',
 }
 
+// Force dynamic rendering to ensure archive updates with latest songs from Supabase
+export const dynamic = 'force-dynamic'
+
 export default async function MusixPage() {
   const archivedSongs = await getArchivedSongs()
   const latestSong = archivedSongs.length > 0 ? archivedSongs[0] : null

@@ -58,6 +58,9 @@ async function getLastFmAlbumArt(apiKey: string, songName: string, artist: strin
   }
 }
 
+// Force dynamic rendering to ensure latest song is always fetched fresh
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const songs = await getArchivedSongs()

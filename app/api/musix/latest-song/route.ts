@@ -1,6 +1,9 @@
 import { getArchivedSongs } from '../../../musix/db'
 import { NextResponse } from 'next/server'
 
+// Force dynamic rendering to ensure latest song is always fetched fresh
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const songs = await getArchivedSongs()
