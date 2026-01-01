@@ -12,48 +12,161 @@ interface LastFmTrackInfo {
       image: Array<{ '#text': string; size: string }>
     }
   }
+  results?: {
+    trackmatches?: {
+      track?: Array<{
+        name: string
+        artist: string
+        image: Array<{ '#text': string; size: string }>
+      }>
+    }
+  }
   error?: number
   message?: string
 }
 
+async function tryTrackGetInfo(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null; success: boolean }> {
+  const params = new URLSearchParams({
+    method: 'track.getInfo',
+    api_key: apiKey,
+    artist: artist,
+    track: songName,
+    format: 'json',
+  })
+
+  const url = `https://ws.audioscrobbler.com/2.0/?${params}`
+  console.log('Last.fm API request (track.getInfo):', { songName, artist, url: url.replace(apiKey, 'REDACTED') })
+  
+  const response = await fetch(url)
+
+  if (!response.ok) {
+    console.error('Last.fm API returned non-OK status:', response.status, response.statusText)
+    return { albumArt: null, albumName: null, success: false }
+  }
+
+  const data: LastFmTrackInfo = await response.json()
+  console.log('Last.fm API response structure:', {
+    hasTrack: !!data.track,
+    hasAlbum: !!data.track?.album,
+    albumTitle: data.track?.album?.title,
+    hasImages: !!data.track?.album?.image,
+    imageCount: data.track?.album?.image?.length || 0,
+    error: data.error,
+    message: data.message,
+  })
+
+  // Check for Last.fm API errors (they return 200 with error in JSON)
+  if (data.error) {
+    console.error('Last.fm API error:', data.error, data.message)
+    return { albumArt: null, albumName: null, success: false }
+  }
+
+  // Check if track exists
+  if (!data.track) {
+    console.warn('Last.fm API: No track data found')
+    return { albumArt: null, albumName: null, success: false }
+  }
+
+  // Check if album exists
+  if (!data.track.album) {
+    console.warn('Last.fm API: No album data found for track')
+    return { albumArt: null, albumName: null, success: false }
+  }
+
+  // Check if images exist
+  if (!data.track.album.image || !Array.isArray(data.track.album.image) || data.track.album.image.length === 0) {
+    console.warn('Last.fm API: No image data found for album')
+    // Still return album name if available, even without art
+    return { albumArt: null, albumName: data.track.album.title || null, success: true }
+  }
+
+  // Get the largest image (usually the last one in the array)
+  const images = data.track.album.image
+  const largestImage = images[images.length - 1]
+  const albumArt = largestImage?.['#text'] || null
+  const albumName = data.track.album.title || null
+
+  console.log('Last.fm API: Extracted album info:', { albumArt: albumArt ? 'found' : 'null', albumName })
+
+  return { albumArt, albumName, success: true }
+}
+
 async function getLastFmAlbumArt(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null }> {
   try {
+    // Try with full artist name first
+    let result = await tryTrackGetInfo(apiKey, songName, artist)
+    if (result.success && (result.albumArt || result.albumName)) {
+      return { albumArt: result.albumArt, albumName: result.albumName }
+    }
+
+    // If that fails and artist has a comma, try with just the first artist
+    if (artist.includes(',')) {
+      const firstArtist = artist.split(',')[0].trim()
+      console.log('Trying with first artist only:', firstArtist)
+      result = await tryTrackGetInfo(apiKey, songName, firstArtist)
+      if (result.success && (result.albumArt || result.albumName)) {
+        return { albumArt: result.albumArt, albumName: result.albumName }
+      }
+    }
+
+    // If track.getInfo fails, try search fallback
+    console.warn('Last.fm track.getInfo failed, trying search fallback')
+    return await tryLastFmSearch(apiKey, songName, artist)
+  } catch (error) {
+    console.error('Error fetching from Last.fm:', error)
+    return { albumArt: null, albumName: null }
+  }
+}
+
+async function tryLastFmSearch(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null }> {
+  try {
+    // Try track.search as fallback - search for "songName artist"
+    const searchQuery = `${songName} ${artist.split(',')[0].trim()}` // Use first artist if comma-separated
     const params = new URLSearchParams({
-      method: 'track.getInfo',
+      method: 'track.search',
       api_key: apiKey,
-      artist: artist,
-      track: songName,
+      track: searchQuery,
       format: 'json',
+      limit: '5',
     })
 
-    const response = await fetch(`https://ws.audioscrobbler.com/2.0/?${params}`)
+    const url = `https://ws.audioscrobbler.com/2.0/?${params}`
+    console.log('Last.fm API fallback search:', { searchQuery, url: url.replace(apiKey, 'REDACTED') })
+    
+    const response = await fetch(url)
 
     if (!response.ok) {
-      console.error('Last.fm API returned non-OK status:', response.status)
+      console.error('Last.fm search API returned non-OK status:', response.status)
       return { albumArt: null, albumName: null }
     }
 
     const data: LastFmTrackInfo = await response.json()
 
-    // Check for Last.fm API errors (they return 200 with error in JSON)
     if (data.error) {
-      console.error('Last.fm API error:', data.error, data.message)
+      console.error('Last.fm search API error:', data.error, data.message)
       return { albumArt: null, albumName: null }
     }
 
-    if (data.track?.album?.image) {
-      // Get the largest image (usually the last one in the array)
-      const images = data.track.album.image
-      const largestImage = images[images.length - 1]
-      const albumArt = largestImage?.['#text'] || null
-      const albumName = data.track.album.title || null
+    // Find best match from search results
+    const tracks = data.results?.trackmatches?.track
+    if (!tracks || !Array.isArray(tracks) || tracks.length === 0) {
+      console.warn('Last.fm search: No tracks found')
+      return { albumArt: null, albumName: null }
+    }
 
-      return { albumArt, albumName }
+    // Use first result (most relevant)
+    const firstTrack = tracks[0]
+    if (firstTrack.image && Array.isArray(firstTrack.image) && firstTrack.image.length > 0) {
+      const largestImage = firstTrack.image[firstTrack.image.length - 1]
+      const albumArt = largestImage?.['#text'] || null
+      console.log('Last.fm search: Found album art from search results')
+      // Note: track.search doesn't return album name, only images
+      return { albumArt, albumName: null }
     }
 
     return { albumArt: null, albumName: null }
   } catch (error) {
-    console.error('Error fetching from Last.fm:', error)
+    console.error('Error in Last.fm search fallback:', error)
     return { albumArt: null, albumName: null }
   }
 }
