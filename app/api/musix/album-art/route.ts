@@ -1,337 +1,117 @@
 import { getArchivedSongs } from '../../../musix/db'
 import { NextResponse } from 'next/server'
 
-interface LastFmTrackInfo {
-  track?: {
-    name: string
-    artist: {
-      name: string
-    }
-    album?: {
-      title: string
-      image: Array<{ '#text': string; size: string }>
-    }
-  }
-  results?: {
-    trackmatches?: {
-      track?: Array<{
-        name: string
-        artist: string
-        image: Array<{ '#text': string; size: string }>
-      }>
-    }
-  }
-  error?: number
-  message?: string
+interface SpotifyTokenResponse {
+  access_token: string
+  token_type: string
+  expires_in: number
 }
 
-async function tryTrackGetInfo(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null; success: boolean }> {
-  const params = new URLSearchParams({
-    method: 'track.getInfo',
-    api_key: apiKey,
-    artist: artist,
-    track: songName,
-    format: 'json',
-  })
+interface SpotifyTrackResponse {
+  id: string
+  name: string
+  artists: Array<{ name: string }>
+  album: {
+    name: string
+    images: Array<{ url: string; height: number; width: number }>
+  }
+}
 
-  const url = `https://ws.audioscrobbler.com/2.0/?${params}`
-  console.log('Last.fm API request (track.getInfo):', { songName, artist, url: url.replace(apiKey, 'REDACTED') })
-  
-  const response = await fetch(url)
+async function getSpotifyAccessToken(clientId: string, clientSecret: string): Promise<string> {
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: clientId,
+      client_secret: clientSecret,
+    }),
+  })
 
   if (!response.ok) {
-    console.error('Last.fm API returned non-OK status:', response.status, response.statusText)
-    return { albumArt: null, albumName: null, success: false }
+    const error = await response.text()
+    throw new Error(`Spotify auth error: ${response.status} ${error}`)
   }
 
-  const data: LastFmTrackInfo = await response.json()
-  const images = data.track?.album?.image || []
-  console.log('Last.fm API response structure:', {
-    hasTrack: !!data.track,
-    hasAlbum: !!data.track?.album,
-    albumTitle: data.track?.album?.title,
-    hasImages: !!images,
-    imageCount: images.length,
-    imageSizes: images.map((img, idx) => ({ 
-      index: idx, 
-      size: img.size, 
-      hasUrl: !!img['#text'], 
-      urlLength: img['#text']?.length || 0,
-      urlPreview: img['#text']?.substring(0, 50) || 'empty',
-      isEmpty: !img['#text'] || img['#text'].trim() === ''
-    })),
-    error: data.error,
-    message: data.message,
-    // Log first few characters of raw response for debugging (sanitized)
-    rawResponseSample: JSON.stringify(data).substring(0, 200),
-  })
-
-  // Check for Last.fm API errors (they return 200 with error in JSON)
-  if (data.error) {
-    console.error('Last.fm API error:', data.error, data.message)
-    return { albumArt: null, albumName: null, success: false }
-  }
-
-  // Check if track exists
-  if (!data.track) {
-    console.warn('Last.fm API: No track data found')
-    return { albumArt: null, albumName: null, success: false }
-  }
-
-  // Check if album exists
-  if (!data.track.album) {
-    console.warn('Last.fm API: No album data found for track')
-    return { albumArt: null, albumName: null, success: false }
-  }
-
-  // Check if images exist
-  if (!data.track.album.image || !Array.isArray(data.track.album.image) || data.track.album.image.length === 0) {
-    console.warn('Last.fm API: No image data found for album')
-    // Still return album name if available, even without art
-    return { albumArt: null, albumName: data.track.album.title || null, success: true }
-  }
-
-  // Get the largest image (usually the last one in the array)
-  // But if it's empty, try other sizes from largest to smallest
-  let albumArtUrl: string | null = null
-  let foundIndex = -1
-  for (let i = images.length - 1; i >= 0; i--) {
-    const img = images[i]
-    const url = img?.['#text']
-    console.log(`Last.fm API: Checking image ${i}:`, {
-      size: img?.size,
-      urlLength: url?.length || 0,
-      isEmpty: !url || url.trim() === '',
-      urlPreview: url?.substring(0, 30) || 'N/A',
-    })
-    if (url && url.trim() !== '') {
-      albumArtUrl = url
-      foundIndex = i
-      console.log('Last.fm API: Found valid image URL:', {
-        imageIndex: i,
-        imageSize: img?.size,
-        urlPreview: url.substring(0, 50),
-      })
-      break
-    }
-  }
-  
-  // Explicitly check for empty strings - Last.fm sometimes returns empty strings
-  const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
-  
-  if (!albumArt) {
-    console.warn('Last.fm API: No valid image URL found in any image size', {
-      totalImages: images.length,
-      checkedIndices: images.map((_, i) => i).reverse().join(', '),
-    })
-  }
-  const albumName = data.track.album.title || null
-
-  console.log('Last.fm API: Extracted album info:', { 
-    albumArt: albumArt ? `found (${albumArt.substring(0, 50)}...)` : 'null', 
-    albumName,
-    foundAtIndex: foundIndex,
-    rawImageUrl: albumArtUrl || 'null'
-  })
-
-  return { albumArt, albumName, success: true }
+  const data: SpotifyTokenResponse = await response.json()
+  return data.access_token
 }
 
-async function tryAlbumGetInfo(apiKey: string, albumName: string, artist: string): Promise<{ albumArt: string | null; success: boolean }> {
-  const params = new URLSearchParams({
-    method: 'album.getInfo',
-    api_key: apiKey,
-    artist: artist,
-    album: albumName,
-    format: 'json',
-  })
-
-  const url = `https://ws.audioscrobbler.com/2.0/?${params}`
-  console.log('Last.fm API request (album.getInfo):', { albumName, artist, url: url.replace(apiKey, 'REDACTED') })
-  
+async function getSpotifyTrackInfo(accessToken: string, trackId: string): Promise<{ albumArt: string | null; albumName: string | null; success: boolean }> {
   try {
-    const response = await fetch(url)
+    const url = `https://api.spotify.com/v1/tracks/${trackId}`
+    console.log('Spotify API: Fetching track info for trackId:', trackId)
+    
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
 
     if (!response.ok) {
-      console.error('Last.fm album.getInfo returned non-OK status:', response.status, response.statusText)
-      return { albumArt: null, success: false }
+      const errorText = await response.text()
+      console.error('Spotify API returned non-OK status:', response.status, response.statusText, errorText)
+      return { albumArt: null, albumName: null, success: false }
     }
 
-    const data: any = await response.json()
+    const data: SpotifyTrackResponse = await response.json()
     
-    if (data.error) {
-      console.error('Last.fm album.getInfo API error:', data.error, data.message)
-      return { albumArt: null, success: false }
-    }
+    console.log('Spotify API response:', {
+      trackName: data.name,
+      albumName: data.album?.name,
+      hasImages: !!data.album?.images,
+      imageCount: data.album?.images?.length || 0,
+      imageSizes: data.album?.images?.map((img, idx) => ({
+        index: idx,
+        height: img.height,
+        width: img.width,
+        urlPreview: img.url?.substring(0, 50) || 'N/A',
+      })) || [],
+    })
 
     if (!data.album) {
-      console.warn('Last.fm album.getInfo: No album data found')
-      return { albumArt: null, success: false }
+      console.warn('Spotify API: No album data found for track')
+      return { albumArt: null, albumName: null, success: false }
     }
 
-    const images = data.album.image || []
-    console.log('Last.fm album.getInfo: Found images:', {
-      imageCount: images.length,
-      imageSizes: images.map((img: any, idx: number) => ({ 
-        index: idx, 
-        size: img.size, 
-        hasUrl: !!img['#text'], 
-        urlLength: img['#text']?.length || 0,
-        isEmpty: !img['#text'] || img['#text'].trim() === ''
-      })),
-    })
-
-    // Try to find a valid image URL from largest to smallest
-    let albumArtUrl: string | null = null
-    for (let i = images.length - 1; i >= 0; i--) {
-      const img = images[i]
-      const url = img?.['#text']
-      if (url && url.trim() !== '') {
-        albumArtUrl = url
-        console.log('Last.fm album.getInfo: Found valid image URL:', {
-          imageIndex: i,
-          imageSize: img?.size,
-          urlPreview: url.substring(0, 50),
-        })
-        break
-      }
-    }
-
-    const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
-    return { albumArt, success: !!albumArt }
-  } catch (error) {
-    console.error('Error in Last.fm album.getInfo:', error)
-    return { albumArt: null, success: false }
-  }
-}
-
-async function getLastFmAlbumArt(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null }> {
-  try {
-    // Try with full artist name first
-    let result = await tryTrackGetInfo(apiKey, songName, artist)
-    if (result.success && result.albumArt) {
-      // Got album art, return it
-      return { albumArt: result.albumArt, albumName: result.albumName }
-    }
+    const albumName = data.album.name || null
     
-    // If we got album name but no art, try album.getInfo
-    if (result.success && result.albumName && !result.albumArt) {
-      console.log('Got album name but no art, trying album.getInfo:', result.albumName)
-      const albumResult = await tryAlbumGetInfo(apiKey, result.albumName, artist)
-      if (albumResult.success && albumResult.albumArt) {
-        return { albumArt: albumResult.albumArt, albumName: result.albumName }
-      }
-      
-      // If artist has a comma, try with just the first artist
-      if (artist.includes(',')) {
-        const firstArtist = artist.split(',')[0].trim()
-        console.log('Trying album.getInfo with first artist only:', firstArtist)
-        const albumResultFirst = await tryAlbumGetInfo(apiKey, result.albumName, firstArtist)
-        if (albumResultFirst.success && albumResultFirst.albumArt) {
-          return { albumArt: albumResultFirst.albumArt, albumName: result.albumName }
-        }
-      }
-      
-      // Still return album name even if we couldn't get art
-      return { albumArt: null, albumName: result.albumName }
-    }
-
-    // If that fails and artist has a comma, try with just the first artist
-    if (artist.includes(',')) {
-      const firstArtist = artist.split(',')[0].trim()
-      console.log('Trying with first artist only:', firstArtist)
-      result = await tryTrackGetInfo(apiKey, songName, firstArtist)
-      if (result.success && result.albumArt) {
-        return { albumArt: result.albumArt, albumName: result.albumName }
-      }
-      
-      // If we got album name but no art, try album.getInfo
-      if (result.success && result.albumName && !result.albumArt) {
-        console.log('Got album name but no art (first artist), trying album.getInfo:', result.albumName)
-        const albumResult = await tryAlbumGetInfo(apiKey, result.albumName, firstArtist)
-        if (albumResult.success && albumResult.albumArt) {
-          return { albumArt: albumResult.albumArt, albumName: result.albumName }
-        }
-      }
-      
-      if (result.success && result.albumName) {
-        return { albumArt: null, albumName: result.albumName }
-      }
-    }
-
-    // If track.getInfo fails, try search fallback
-    console.warn('Last.fm track.getInfo failed, trying search fallback')
-    return await tryLastFmSearch(apiKey, songName, artist)
-  } catch (error) {
-    console.error('Error fetching from Last.fm:', error)
-    return { albumArt: null, albumName: null }
-  }
-}
-
-async function tryLastFmSearch(apiKey: string, songName: string, artist: string): Promise<{ albumArt: string | null; albumName: string | null }> {
-  try {
-    // Try track.search as fallback - search for "songName artist"
-    const searchQuery = `${songName} ${artist.split(',')[0].trim()}` // Use first artist if comma-separated
-    const params = new URLSearchParams({
-      method: 'track.search',
-      api_key: apiKey,
-      track: searchQuery,
-      format: 'json',
-      limit: '5',
-    })
-
-    const url = `https://ws.audioscrobbler.com/2.0/?${params}`
-    console.log('Last.fm API fallback search:', { searchQuery, url: url.replace(apiKey, 'REDACTED') })
+    // Get the largest image (usually the first one, sorted by size)
+    // Spotify images are typically sorted largest to smallest
+    const images = data.album.images || []
+    let albumArt: string | null = null
     
-    const response = await fetch(url)
-
-    if (!response.ok) {
-      console.error('Last.fm search API returned non-OK status:', response.status)
-      return { albumArt: null, albumName: null }
-    }
-
-    const data: LastFmTrackInfo = await response.json()
-
-    if (data.error) {
-      console.error('Last.fm search API error:', data.error, data.message)
-      return { albumArt: null, albumName: null }
-    }
-
-    // Find best match from search results
-    const tracks = data.results?.trackmatches?.track
-    if (!tracks || !Array.isArray(tracks) || tracks.length === 0) {
-      console.warn('Last.fm search: No tracks found')
-      return { albumArt: null, albumName: null }
-    }
-
-    // Use first result (most relevant)
-    const firstTrack = tracks[0]
-    if (firstTrack.image && Array.isArray(firstTrack.image) && firstTrack.image.length > 0) {
-      // Try to find a valid image URL from largest to smallest
-      let albumArtUrl: string | null = null
-      for (let i = firstTrack.image.length - 1; i >= 0; i--) {
-        const img = firstTrack.image[i]
-        const url = img?.['#text']
-        if (url && url.trim() !== '') {
-          albumArtUrl = url
-          break
+    if (images.length > 0) {
+      // Use the first image (largest) or find the best one
+      // Spotify typically provides images in order: large, medium, small
+      albumArt = images[0]?.url || null
+      
+      // If first image is missing, try others
+      if (!albumArt) {
+        for (const img of images) {
+          if (img.url && img.url.trim() !== '') {
+            albumArt = img.url
+            break
+          }
         }
       }
       
-      // Explicitly check for empty strings - Last.fm sometimes returns empty strings
-      const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
-      console.log('Last.fm search: Found album art from search results', { 
-        albumArt: albumArt ? `found (${albumArt.substring(0, 50)}...)` : 'null',
-        rawImageUrl: albumArtUrl 
+      console.log('Spotify API: Selected album art:', {
+        albumArt: albumArt ? `${albumArt.substring(0, 50)}...` : 'null',
+        imageIndex: 0,
+        imageHeight: images[0]?.height,
+        imageWidth: images[0]?.width,
       })
-      // Note: track.search doesn't return album name, only images
-      return { albumArt, albumName: null }
+    } else {
+      console.warn('Spotify API: No images found for album')
     }
 
-    return { albumArt: null, albumName: null }
+    return { albumArt, albumName, success: true }
   } catch (error) {
-    console.error('Error in Last.fm search fallback:', error)
-    return { albumArt: null, albumName: null }
+    console.error('Error fetching from Spotify:', error)
+    return { albumArt: null, albumName: null, success: false }
   }
 }
 
@@ -355,28 +135,58 @@ export async function GET(request: Request) {
       }, { status: 200 })
     }
 
-    const lastFmApiKey = process.env.LASTFM_API_KEY
-    if (!lastFmApiKey) {
-      console.warn('LASTFM_API_KEY not found in environment variables - album art will not be fetched')
+    // Check if we have Spotify credentials
+    const clientId = process.env.SPOTIFY_CLIENT_ID
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
+
+    if (!clientId || !clientSecret) {
+      console.warn('SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET not found in environment variables - album art will not be fetched')
       return NextResponse.json({
         songName: latestSong.songName,
         artist: latestSong.artist,
         albumArt: null,
         albumName: null,
-        ...(debug && { debug: { error: 'LASTFM_API_KEY not found' } }),
+        ...(debug && { debug: { error: 'Spotify credentials not found' } }),
       }, { status: 200 })
     }
 
-    // Get album art from Last.fm
-    // getLastFmAlbumArt handles errors gracefully and returns null values
+    // Check if we have a Spotify track ID
+    if (!latestSong.spotifyTrackId) {
+      console.warn('No Spotify track ID found for latest song - cannot fetch album art')
+      return NextResponse.json({
+        songName: latestSong.songName,
+        artist: latestSong.artist,
+        albumArt: null,
+        albumName: null,
+        ...(debug && { debug: { error: 'No spotifyTrackId found' } }),
+      }, { status: 200 })
+    }
+
+    // Get Spotify access token
     console.log('Album Art API: Fetching for song:', {
       songName: latestSong.songName,
       artist: latestSong.artist,
+      spotifyTrackId: latestSong.spotifyTrackId,
     })
-    const { albumArt, albumName } = await getLastFmAlbumArt(
-      lastFmApiKey,
-      latestSong.songName,
-      latestSong.artist
+    
+    let accessToken: string
+    try {
+      accessToken = await getSpotifyAccessToken(clientId, clientSecret)
+    } catch (error) {
+      console.error('Failed to get Spotify access token:', error)
+      return NextResponse.json({
+        songName: latestSong.songName,
+        artist: latestSong.artist,
+        albumArt: null,
+        albumName: null,
+        ...(debug && { debug: { error: 'Failed to get Spotify access token', details: String(error) } }),
+      }, { status: 200 })
+    }
+
+    // Get track info from Spotify
+    const { albumArt, albumName, success } = await getSpotifyTrackInfo(
+      accessToken,
+      latestSong.spotifyTrackId
     )
     
     console.log('Album Art API: Final result:', {
@@ -384,10 +194,11 @@ export async function GET(request: Request) {
       albumName: albumName || 'null',
       albumArtType: typeof albumArt,
       albumArtLength: albumArt?.length || 0,
+      success,
     })
     
     // Always return 200 with song info, even if album art is null
-    // This prevents Last.fm errors from causing 500 responses
+    // This prevents Spotify errors from causing 500 responses
     return NextResponse.json({
       songName: latestSong.songName,
       artist: latestSong.artist,
@@ -399,17 +210,20 @@ export async function GET(request: Request) {
           albumArtLength: albumArt?.length || 0,
           albumArtPreview: albumArt?.substring(0, 100) || null,
           hasAlbumArt: !!albumArt,
+          success,
+          spotifyTrackId: latestSong.spotifyTrackId,
         }
       }),
     }, { status: 200 })
   } catch (error) {
-    // Only catch database errors here - Last.fm errors are handled in getLastFmAlbumArt
-    console.error('Error fetching album art (database error):', error)
+    // Only catch unexpected errors here
+    console.error('Error fetching album art (unexpected error):', error)
     return NextResponse.json({ 
       songName: null, 
       artist: null, 
       albumArt: null,
-      albumName: null
+      albumName: null,
+      ...(debug && { debug: { error: 'Unexpected error', details: String(error) } }),
     }, { status: 200 })
   }
 }
