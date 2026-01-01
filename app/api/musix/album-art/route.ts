@@ -45,12 +45,14 @@ async function tryTrackGetInfo(apiKey: string, songName: string, artist: string)
   }
 
   const data: LastFmTrackInfo = await response.json()
+  const images = data.track?.album?.image || []
   console.log('Last.fm API response structure:', {
     hasTrack: !!data.track,
     hasAlbum: !!data.track?.album,
     albumTitle: data.track?.album?.title,
-    hasImages: !!data.track?.album?.image,
-    imageCount: data.track?.album?.image?.length || 0,
+    hasImages: !!images,
+    imageCount: images.length,
+    imageSizes: images.map((img, idx) => ({ index: idx, size: img.size, hasUrl: !!img['#text'], urlPreview: img['#text']?.substring(0, 50) || 'empty' })),
     error: data.error,
     message: data.message,
   })
@@ -81,12 +83,35 @@ async function tryTrackGetInfo(apiKey: string, songName: string, artist: string)
   }
 
   // Get the largest image (usually the last one in the array)
-  const images = data.track.album.image
-  const largestImage = images[images.length - 1]
-  const albumArt = largestImage?.['#text'] || null
+  // But if it's empty, try other sizes from largest to smallest
+  let albumArtUrl: string | null = null
+  for (let i = images.length - 1; i >= 0; i--) {
+    const img = images[i]
+    const url = img?.['#text']
+    if (url && url.trim() !== '') {
+      albumArtUrl = url
+      console.log('Last.fm API: Found valid image URL:', {
+        imageIndex: i,
+        imageSize: img?.size,
+        urlPreview: url.substring(0, 50),
+      })
+      break
+    }
+  }
+  
+  // Explicitly check for empty strings - Last.fm sometimes returns empty strings
+  const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
+  
+  if (!albumArt) {
+    console.warn('Last.fm API: No valid image URL found in any image size')
+  }
   const albumName = data.track.album.title || null
 
-  console.log('Last.fm API: Extracted album info:', { albumArt: albumArt ? 'found' : 'null', albumName })
+  console.log('Last.fm API: Extracted album info:', { 
+    albumArt: albumArt ? `found (${albumArt.substring(0, 50)}...)` : 'null', 
+    albumName,
+    rawImageUrl: albumArtUrl 
+  })
 
   return { albumArt, albumName, success: true }
 }
@@ -157,9 +182,23 @@ async function tryLastFmSearch(apiKey: string, songName: string, artist: string)
     // Use first result (most relevant)
     const firstTrack = tracks[0]
     if (firstTrack.image && Array.isArray(firstTrack.image) && firstTrack.image.length > 0) {
-      const largestImage = firstTrack.image[firstTrack.image.length - 1]
-      const albumArt = largestImage?.['#text'] || null
-      console.log('Last.fm search: Found album art from search results')
+      // Try to find a valid image URL from largest to smallest
+      let albumArtUrl: string | null = null
+      for (let i = firstTrack.image.length - 1; i >= 0; i--) {
+        const img = firstTrack.image[i]
+        const url = img?.['#text']
+        if (url && url.trim() !== '') {
+          albumArtUrl = url
+          break
+        }
+      }
+      
+      // Explicitly check for empty strings - Last.fm sometimes returns empty strings
+      const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
+      console.log('Last.fm search: Found album art from search results', { 
+        albumArt: albumArt ? `found (${albumArt.substring(0, 50)}...)` : 'null',
+        rawImageUrl: albumArtUrl 
+      })
       // Note: track.search doesn't return album name, only images
       return { albumArt, albumName: null }
     }

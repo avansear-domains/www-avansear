@@ -30,6 +30,13 @@ export function SpinningDisc() {
         return res.json()
       })
       .then((data) => {
+        console.log('SpinningDisc: Received album data:', {
+          songName: data?.songName,
+          artist: data?.artist,
+          albumName: data?.albumName,
+          albumArt: data?.albumArt ? `${data.albumArt.substring(0, 50)}...` : 'null',
+          hasAlbumArt: !!data?.albumArt,
+        })
         if (data && data.songName) {
           setAlbumInfo(data)
         }
@@ -150,6 +157,22 @@ export function SpinningDisc() {
                 src={albumInfo.albumArt} 
                 alt={`${albumInfo.albumName || albumInfo.songName} cover`}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.error('Failed to load album art:', albumInfo.albumArt, e)
+                  // Fallback to emoji if image fails to load
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                  const parent = target.parentElement
+                  if (parent && !parent.querySelector('.fallback-emoji')) {
+                    const fallback = document.createElement('div')
+                    fallback.className = 'fallback-emoji w-full h-full flex items-center justify-center'
+                    fallback.innerHTML = '<div class="text-2xl">🎵</div>'
+                    parent.appendChild(fallback)
+                  }
+                }}
+                onLoad={() => {
+                  console.log('Album art loaded successfully:', albumInfo.albumArt)
+                }}
               />
               {/* 50% overlay of --color-dark */}
               <div 
