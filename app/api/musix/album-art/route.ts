@@ -52,9 +52,18 @@ async function tryTrackGetInfo(apiKey: string, songName: string, artist: string)
     albumTitle: data.track?.album?.title,
     hasImages: !!images,
     imageCount: images.length,
-    imageSizes: images.map((img, idx) => ({ index: idx, size: img.size, hasUrl: !!img['#text'], urlPreview: img['#text']?.substring(0, 50) || 'empty' })),
+    imageSizes: images.map((img, idx) => ({ 
+      index: idx, 
+      size: img.size, 
+      hasUrl: !!img['#text'], 
+      urlLength: img['#text']?.length || 0,
+      urlPreview: img['#text']?.substring(0, 50) || 'empty',
+      isEmpty: !img['#text'] || img['#text'].trim() === ''
+    })),
     error: data.error,
     message: data.message,
+    // Log first few characters of raw response for debugging (sanitized)
+    rawResponseSample: JSON.stringify(data).substring(0, 200),
   })
 
   // Check for Last.fm API errors (they return 200 with error in JSON)
@@ -85,11 +94,19 @@ async function tryTrackGetInfo(apiKey: string, songName: string, artist: string)
   // Get the largest image (usually the last one in the array)
   // But if it's empty, try other sizes from largest to smallest
   let albumArtUrl: string | null = null
+  let foundIndex = -1
   for (let i = images.length - 1; i >= 0; i--) {
     const img = images[i]
     const url = img?.['#text']
+    console.log(`Last.fm API: Checking image ${i}:`, {
+      size: img?.size,
+      urlLength: url?.length || 0,
+      isEmpty: !url || url.trim() === '',
+      urlPreview: url?.substring(0, 30) || 'N/A',
+    })
     if (url && url.trim() !== '') {
       albumArtUrl = url
+      foundIndex = i
       console.log('Last.fm API: Found valid image URL:', {
         imageIndex: i,
         imageSize: img?.size,
@@ -103,14 +120,18 @@ async function tryTrackGetInfo(apiKey: string, songName: string, artist: string)
   const albumArt = albumArtUrl && albumArtUrl.trim() !== '' ? albumArtUrl : null
   
   if (!albumArt) {
-    console.warn('Last.fm API: No valid image URL found in any image size')
+    console.warn('Last.fm API: No valid image URL found in any image size', {
+      totalImages: images.length,
+      checkedIndices: images.map((_, i) => i).reverse().join(', '),
+    })
   }
   const albumName = data.track.album.title || null
 
   console.log('Last.fm API: Extracted album info:', { 
     albumArt: albumArt ? `found (${albumArt.substring(0, 50)}...)` : 'null', 
     albumName,
-    rawImageUrl: albumArtUrl 
+    foundAtIndex: foundIndex,
+    rawImageUrl: albumArtUrl || 'null'
   })
 
   return { albumArt, albumName, success: true }
@@ -213,8 +234,11 @@ async function tryLastFmSearch(apiKey: string, songName: string, artist: string)
 // Force dynamic rendering to ensure latest song is always fetched fresh
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url)
+    const debug = url.searchParams.get('debug') === 'true'
+    
     const songs = await getArchivedSongs()
     const latestSong = songs.length > 0 ? songs[0] : null
     
@@ -235,16 +259,28 @@ export async function GET() {
         artist: latestSong.artist,
         albumArt: null,
         albumName: null,
+        ...(debug && { debug: { error: 'LASTFM_API_KEY not found' } }),
       }, { status: 200 })
     }
 
     // Get album art from Last.fm
     // getLastFmAlbumArt handles errors gracefully and returns null values
+    console.log('Album Art API: Fetching for song:', {
+      songName: latestSong.songName,
+      artist: latestSong.artist,
+    })
     const { albumArt, albumName } = await getLastFmAlbumArt(
       lastFmApiKey,
       latestSong.songName,
       latestSong.artist
     )
+    
+    console.log('Album Art API: Final result:', {
+      albumArt: albumArt ? `${albumArt.substring(0, 50)}...` : 'null',
+      albumName: albumName || 'null',
+      albumArtType: typeof albumArt,
+      albumArtLength: albumArt?.length || 0,
+    })
     
     // Always return 200 with song info, even if album art is null
     // This prevents Last.fm errors from causing 500 responses
@@ -253,6 +289,14 @@ export async function GET() {
       artist: latestSong.artist,
       albumArt: albumArt,
       albumName: albumName,
+      ...(debug && { 
+        debug: {
+          albumArtType: typeof albumArt,
+          albumArtLength: albumArt?.length || 0,
+          albumArtPreview: albumArt?.substring(0, 100) || null,
+          hasAlbumArt: !!albumArt,
+        }
+      }),
     }, { status: 200 })
   } catch (error) {
     // Only catch database errors here - Last.fm errors are handled in getLastFmAlbumArt
