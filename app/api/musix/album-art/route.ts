@@ -119,10 +119,10 @@ async function getSpotifyTrackInfo(accessToken: string, trackId: string): Promis
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const url = new URL(request.url)
+  const isDebugMode = url.searchParams.get('debug') === 'true'
+  
   try {
-    const url = new URL(request.url)
-    const isDebugMode = url.searchParams.get('debug') === 'true'
-    
     const songs = await getArchivedSongs()
     const latestSong = songs.length > 0 ? songs[0] : null
     
