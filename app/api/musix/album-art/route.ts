@@ -121,7 +121,7 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url)
-    const debug = url.searchParams.get('debug') === 'true'
+    const isDebugMode = url.searchParams.get('debug') === 'true'
     
     const songs = await getArchivedSongs()
     const latestSong = songs.length > 0 ? songs[0] : null
@@ -146,7 +146,7 @@ export async function GET(request: Request) {
         artist: latestSong.artist,
         albumArt: null,
         albumName: null,
-        ...(debug && { debug: { error: 'Spotify credentials not found' } }),
+        ...(isDebugMode && { debug: { error: 'Spotify credentials not found' } }),
       }, { status: 200 })
     }
 
@@ -158,7 +158,7 @@ export async function GET(request: Request) {
         artist: latestSong.artist,
         albumArt: null,
         albumName: null,
-        ...(debug && { debug: { error: 'No spotifyTrackId found' } }),
+        ...(isDebugMode && { debug: { error: 'No spotifyTrackId found' } }),
       }, { status: 200 })
     }
 
@@ -179,7 +179,7 @@ export async function GET(request: Request) {
         artist: latestSong.artist,
         albumArt: null,
         albumName: null,
-        ...(debug && { debug: { error: 'Failed to get Spotify access token', details: String(error) } }),
+        ...(isDebugMode && { debug: { error: 'Failed to get Spotify access token', details: String(error) } }),
       }, { status: 200 })
     }
 
@@ -204,7 +204,7 @@ export async function GET(request: Request) {
       artist: latestSong.artist,
       albumArt: albumArt,
       albumName: albumName,
-      ...(debug && { 
+      ...(isDebugMode && { 
         debug: {
           albumArtType: typeof albumArt,
           albumArtLength: albumArt?.length || 0,
@@ -223,7 +223,7 @@ export async function GET(request: Request) {
       artist: null, 
       albumArt: null,
       albumName: null,
-      ...(debug && { debug: { error: 'Unexpected error', details: String(error) } }),
+      ...(isDebugMode && { debug: { error: 'Unexpected error', details: String(error) } }),
     }, { status: 200 })
   }
 }
