@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/myfonts/:path*',
+        destination: '/fonts/:path*',
+      },
+    ]
+  },
   async headers() {
     return [
       {
