@@ -32,6 +32,7 @@ declare namespace YT {
       onReady?: (event: PlayerEvent) => void
       onStateChange?: (event: OnStateChangeEvent) => void
       onError?: (event: PlayerEvent) => void
+      onAutoplayBlocked?: () => void
     }
   }
 

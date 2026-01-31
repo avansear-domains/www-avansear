@@ -14,46 +14,45 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
   const hasInteractedRef = useRef(false)
   const currentYoutubeIdRef = useRef<string | null>(null)
 
-  // Fetch latest song and search YouTube for it
+  // Fetch latest song and search YouTube for it (abort on cleanup to avoid double-fetch in Strict Mode / Arc)
   useEffect(() => {
+    const ac = new AbortController()
     async function fetchAndPlayLatestSong() {
       try {
         console.log('BackgroundAudio: Fetching latest song...')
-        const response = await fetch('/api/musix/latest-song')
+        const response = await fetch('/api/musix/latest-song', { signal: ac.signal })
         const data = await response.json()
-        
+
+        if (ac.signal.aborted) return
         if (!data.songName || !data.artist) {
           console.log('BackgroundAudio: No song found')
           return
         }
 
         console.log('BackgroundAudio: Found song:', data.songName, 'by', data.artist)
-        
-        // Search YouTube for the song
-        console.log('BackgroundAudio: Searching YouTube...')
+
         const searchResponse = await fetch('/api/musix/search-youtube', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            songName: data.songName,
-            artist: data.artist,
-          }),
+          body: JSON.stringify({ songName: data.songName, artist: data.artist }),
+          signal: ac.signal,
         })
-        
         const searchData = await searchResponse.json()
-        
+
+        if (ac.signal.aborted) return
         if (searchData.youtubeId) {
           console.log('BackgroundAudio: Found YouTube ID:', searchData.youtubeId)
           setYoutubeId(searchData.youtubeId)
         } else {
           console.log('BackgroundAudio: No YouTube video found')
         }
-      } catch (error) {
-        console.error('BackgroundAudio: Error:', error)
+      } catch (e) {
+        if (e instanceof Error && e.name === 'AbortError') return
+        console.error('BackgroundAudio: Error:', e)
       }
     }
-
     fetchAndPlayLatestSong()
+    return () => ac.abort()
   }, [])
 
   // Handle YouTube embed
@@ -132,9 +131,11 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
       // Reset ready state
       isReadyRef.current = false
 
-      // Create hidden player
+      // Create hidden player — YouTube requires viewport ≥200×200; we use 480×270 and hide it off‑screen
       console.log('BackgroundAudio: Creating new YouTube player')
       playerRef.current = new window.YT.Player(youtubeContainerRef.current, {
+        width: 480,
+        height: 270,
         videoId: youtubeId,
         playerVars: {
           autoplay: 1,
@@ -173,6 +174,10 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
           },
           onError: (event: YT.PlayerEvent) => {
             console.error('BackgroundAudio: Player error:', event.data)
+          },
+          onAutoplayBlocked: () => {
+            console.log('BackgroundAudio: Autoplay blocked by browser — user interaction required')
+            window.dispatchEvent(new CustomEvent('autoplayBlocked'))
           },
         },
       })
@@ -264,16 +269,18 @@ export function BackgroundAudio({}: BackgroundAudioProps) {
 
   return (
     <div
-      ref={youtubeContainerRef}
       style={{
         position: 'absolute',
-        width: '1px',
-        height: '1px',
-        opacity: 0,
-        pointerEvents: 'none',
+        left: -9999,
+        top: 0,
+        width: 480,
+        height: 270,
         overflow: 'hidden',
+        pointerEvents: 'none',
       }}
       aria-hidden="true"
-    />
+    >
+      <div ref={youtubeContainerRef} style={{ width: 480, height: 270 }} />
+    </div>
   )
 }

@@ -26,7 +26,7 @@ export default function Page() {
               ease: "easeOut"
             }}
           >
-            sear (vishruth siddi)
+            sear (vishruth)
           </motion.span>
         </AnimatedHeading>
       </div>
