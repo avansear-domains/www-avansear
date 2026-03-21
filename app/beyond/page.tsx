@@ -18,6 +18,12 @@ export default function Page() {
         href="/musix"
         variant='arrow-right'
       />
+      <Card
+        title="travelogue"
+        href="/travelogue"
+        variant='arrow-right'
+        className="mt-4"
+      />
     </section>
   )
 }

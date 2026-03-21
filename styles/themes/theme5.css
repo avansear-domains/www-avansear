@@ -3,5 +3,6 @@ html[data-theme="theme5"] {
     --color-light: #eeeeee;
     --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
     --color-light-20: color-mix(in srgb, var(--color-light) 20%, transparent);
+    --color-light-05: color-mix(in srgb, var(--color-light) 5%, transparent);
 }
 

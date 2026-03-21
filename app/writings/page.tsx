@@ -15,7 +15,7 @@ function RSSIcon() {
       viewBox="0 0 24 24" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
-      className="text-[var(--color-light-80)]"
+      className="text-[var(--color-light)]/80"
     >
       <circle cx="3.429" cy="20.571" r="1.429" fill="currentColor"/>
       <path d="M11.429 20.571H8.857C8.857 16.046 5.239 12.428 0.714 12.428V9.857C6.665 9.857 11.429 14.621 11.429 20.571Z" fill="currentColor"/>
@@ -37,9 +37,9 @@ export default function Page() {
       </div>
 
       <div>
-        <Link className="flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]" href="/rss">
+        <Link className="flex flex-col space-y-1 mb-4 border-[var(--color-light)]/80" href="/rss">
           <div className="w-full flex flex-row space-x-2 items-center">
-            <p className="text-[var(--color-light-80)] w-fit tracking-tighter whitespace-nowrap flex-shrink-0">
+            <p className="text-[var(--color-light)]/80 w-fit tracking-tighter whitespace-nowrap flex-shrink-0">
               rss feed
             </p>
             <p className="text-[var(--color-dark)] dark:text-[var(--color-light)] tracking-tighter truncate">

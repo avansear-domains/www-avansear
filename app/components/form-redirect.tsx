@@ -18,7 +18,7 @@ export function FormRedirect({
       <p className="text-[var(--color-dark)] dark:text-[var(--color-light)] tracking-tighter">
         opening form…
         {visitCount != null && (
-          <span className="block mt-2 text-sm text-[var(--color-light-80)]">
+          <span className="block mt-2 text-sm text-[var(--color-light)]/80">
             opens: {visitCount.toLocaleString()}
           </span>
         )}

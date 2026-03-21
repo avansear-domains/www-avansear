@@ -34,13 +34,14 @@ export function Card({
   variant = 'arrow-left',
 }: CardProps) {
   const isArrowRight = variant === 'arrow-right'
+  const hasDescription = Boolean(description)
 
   return (
     <Link
       href={href}
-      className={`group block w-full rounded-xl border border-[var(--color-light-80)] bg-[var(--color-light-20)] p-4 ${className}`}
+      className={`group block w-full rounded-xl border border-[var(--color-light)]/80 bg-[var(--color-light)]/5 p-4 transition-colors duration-300 ease-out hover:bg-[var(--color-light)]/20 ${className}`}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className={`flex justify-between gap-4 ${hasDescription ? 'items-start' : 'items-center'}`}>
         {!isArrowRight && (
           <span
             className="inline-flex h-7 w-7 items-center justify-center rounded-full"

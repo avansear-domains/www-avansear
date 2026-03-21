@@ -132,7 +132,7 @@ export function SpinningDisc() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-sm text-[var(--color-light-80)]">Loading...</div>
+        <div className="text-sm text-[var(--color-light)]/80">Loading...</div>
       </div>
     )
   }
@@ -216,13 +216,13 @@ export function SpinningDisc() {
           {albumInfo.songName.toLowerCase()}
           </Link>
         </h3>
-        <p className="text-sm tracking-tight text-[var(--color-light-80)]">
+        <p className="text-sm tracking-tight text-[var(--color-light)]/80">
           <Link href="/musix" className="hover:underline">
           {albumInfo.artist.toLowerCase()}
           </Link>
         </p>
         {albumInfo.albumName && (
-          <p className="text-xs tracking-tight text-[var(--color-light-80)] italic">
+          <p className="text-xs tracking-tight text-[var(--color-light)]/80 italic">
             <Link href="/musix" className="hover:underline">
             {albumInfo.albumName.toLowerCase()}
             </Link>

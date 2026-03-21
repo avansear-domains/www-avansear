@@ -9,7 +9,7 @@ module.exports = {
             colors: {
                 'dark': 'var(--color-dark)',
                 'light': 'var(--color-light)',
-                'light-80': 'var(--color-light-80)',
+                'light-80': 'color-mix(in srgb, var(--color-light) 80%, transparent)',
             },
         },
     },

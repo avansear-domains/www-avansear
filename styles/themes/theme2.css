@@ -4,4 +4,5 @@ html[data-theme="theme2"] {
     --color-light: #00274C;
     --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
     --color-light-20: color-mix(in srgb, var(--color-light) 20%, transparent);
+    --color-light-05: color-mix(in srgb, var(--color-light) 5%, transparent);
 }

@@ -48,7 +48,7 @@ export default async function MusixPage() {
               rel="noopener noreferrer"
             >
               <div className="w-full flex flex-row space-x-2">
-                <p className="text-[var(--color-light-80)] w-fit tabular-nums flex-shrink-0">
+                <p className="text-[var(--color-light)]/80 w-fit tabular-nums flex-shrink-0">
                   {song.week.toLowerCase()}
                 </p>
                 <p className="text-[var(--color-dark)] dark:text-[var(--color-light)] tracking-tight">

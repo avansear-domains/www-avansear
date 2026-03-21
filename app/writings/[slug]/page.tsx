@@ -113,7 +113,7 @@ export default async function Blog({ params }) {
       </div>
 
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
-        <p className="text-sm text-[var(--color-light-80)]">
+        <p className="text-sm text-[var(--color-light)]/80">
           {formatDate(post!.metadata.publishedAt)}
         </p>
       </div>
