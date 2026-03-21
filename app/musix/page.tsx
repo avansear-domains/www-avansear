@@ -38,7 +38,7 @@ export default async function MusixPage() {
           {archivedSongs.map((song) => (
             <a
               key={song.spotifyTrackId || song.youtubeId}
-              className="page-link flex flex-col space-y-1 mb-4"
+              className="flex flex-col space-y-1 mb-4"
               href={song.spotifyTrackId 
                 ? `https://open.spotify.com/track/${song.spotifyTrackId}`
                 : song.youtubeId 

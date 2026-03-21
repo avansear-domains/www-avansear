@@ -20,7 +20,7 @@ export default function Page() {
       </div>
       <div>
         <ProjectPosts />
-        <Link className="page-link flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]" href="/archive">
+        <Link className="flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]" href="/archive">
           <div className="w-full flex flex-row space-x-2 items-center">
             <p className="text-[var(--color-light-80)] w-fit tracking-tighter whitespace-nowrap flex-shrink-0">
               ar(t)chives

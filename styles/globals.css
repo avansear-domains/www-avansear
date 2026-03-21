@@ -34,6 +34,7 @@
     --color-dark: #0C0C0C;
     --color-light: #eeeeee;
     --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
+    --color-light-20: color-mix(in srgb, var(--color-light) 20%, transparent);
   }
 
   /* Custom text selection colors */
@@ -63,13 +64,4 @@
 
 .title-spacing {
   margin-bottom: 2rem;
-}
-
-.page-link {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.page-link:hover {
-  text-decoration: none;
 }

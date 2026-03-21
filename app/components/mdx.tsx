@@ -28,23 +28,20 @@ function Table({ data }) {
 
 function CustomLink(props) {
   let href = props.href
-  const combinedClassName = props.className
-    ? `page-link ${props.className}`
-    : 'page-link'
 
   if (href.startsWith('/')) {
     return (
-      <Link href={href} {...props} className={combinedClassName}>
+      <Link href={href} {...props}>
         {props.children}
       </Link>
     )
   }
 
   if (href.startsWith('#')) {
-    return <a {...props} className={combinedClassName} />
+    return <a {...props} />
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} className={combinedClassName} />
+  return <a target="_blank" rel="noopener noreferrer" {...props} />
 }
 
 function RoundedImage(props) {

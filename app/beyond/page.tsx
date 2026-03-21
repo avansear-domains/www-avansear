@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { AnimatedHeading } from '../components/animated-heading'
+import { Card } from '../components/Card'
 
 export default function Page() {
   return (
@@ -8,11 +8,16 @@ export default function Page() {
         <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
           beyond
         </AnimatedHeading>
-        <p> stuff i wanna include here over time </p>
+        <p>
+          stuff i wanna include here over time
+        </p>
       </div>
-      <p className="text-sm">
-        this is my <Link href="/musix" className="page-link">music</Link> history
-      </p>
+      <Card
+        title="music"
+        description="my fav songs :D"
+        href="/musix"
+        variant='arrow-right'
+      />
     </section>
   )
 }
