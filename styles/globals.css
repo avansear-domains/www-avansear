@@ -60,3 +60,16 @@
 .spinning-disc {
   animation: spin-disc 8s linear infinite;
 }
+
+.title-spacing {
+  margin-bottom: 2rem;
+}
+
+.page-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.page-link:hover {
+  text-decoration: none;
+}

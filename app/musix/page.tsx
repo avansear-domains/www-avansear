@@ -19,7 +19,7 @@ export default async function MusixPage() {
 
   return (
     <section>
-      <div className="mb-8">
+      <div className="title-spacing">
         <AnimatedHeading className="title font-semibold text-2xl tracking-tighter">
           song of the week
         </AnimatedHeading>
@@ -38,7 +38,7 @@ export default async function MusixPage() {
           {archivedSongs.map((song) => (
             <a
               key={song.spotifyTrackId || song.youtubeId}
-              className="flex flex-col space-y-1 mb-4"
+              className="page-link flex flex-col space-y-1 mb-4"
               href={song.spotifyTrackId 
                 ? `https://open.spotify.com/track/${song.spotifyTrackId}`
                 : song.youtubeId 

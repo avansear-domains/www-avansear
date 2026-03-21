@@ -12,9 +12,9 @@ export default function Page() {
   return (
     <section>
       <BackgroundAudio />
-      <div className="p-4 -m-4">
+      <div className="p-4 -m-4 mb-4 sm:-mb-4">
         <AnimatedHeading 
-          className="mb-4 sm:mb-8 text-2xl font-semibold tracking-tighter"
+          className="text-2xl font-semibold tracking-tighter"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -29,12 +29,11 @@ export default function Page() {
             sear (vishruth)
           </motion.span>
         </AnimatedHeading>
+        <p className="sm:mb-4">
+          {`high functioning insomniac. 20 y/o weirdo who does things based on instincts and intuition.`}
+        </p>
       </div>
-      
-      <p className="sm:mb-4">
-        {`high functioning insomniac. 20 y/o weirdo who does things based on instincts and intuition.`}
-      </p>
-      
+
       <SpinningDisc />
     </section>
   )

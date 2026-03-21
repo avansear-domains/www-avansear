@@ -9,9 +9,9 @@ export default function Page() {
 
   return (
     <section>
-      <div className="p-4 -m-4">
+      <div className="p-4 -m-4 title-spacing">
         <AnimatedHeading 
-          className="mb-4 sm:mb-8 text-2xl font-semibold tracking-tighter"
+          className="text-2xl font-semibold tracking-tighter"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >

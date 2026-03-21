@@ -27,7 +27,7 @@ function RSSIcon() {
 export default function Page() {
   return (
     <section>
-      <div className="mb-8">
+      <div className="title-spacing">
         <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
           writings
         </AnimatedHeading>
@@ -37,7 +37,7 @@ export default function Page() {
       </div>
 
       <div>
-        <Link className="flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]" href="/rss">
+        <Link className="page-link flex flex-col space-y-1 mb-4 border-[var(--color-light-80)]" href="/rss">
           <div className="w-full flex flex-row space-x-2 items-center">
             <p className="text-[var(--color-light-80)] w-fit tracking-tighter whitespace-nowrap flex-shrink-0">
               rss feed

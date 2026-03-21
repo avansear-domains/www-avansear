@@ -8,7 +8,7 @@ export const metadata = {
 export default function Page() {
   return (
     <section>
-      <div className="mb-8">
+      <div className="title-spacing">
         <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
           curly hair routine
         </AnimatedHeading>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { Play } from 'lucide-react'
+import Link from 'next/link'
 
 interface AlbumInfo {
   songName: string
@@ -211,14 +212,20 @@ export function SpinningDisc() {
       {/* Song Info */}
       <div className="space-y-1">
         <h3 className="text-lg font-semibold tracking-tighter text-[var(--color-dark)] dark:text-[var(--color-light)]">
+          <Link href="/musix" className="hover:underline">
           {albumInfo.songName.toLowerCase()}
+          </Link>
         </h3>
         <p className="text-sm tracking-tight text-[var(--color-light-80)]">
+          <Link href="/musix" className="hover:underline">
           {albumInfo.artist.toLowerCase()}
+          </Link>
         </p>
         {albumInfo.albumName && (
           <p className="text-xs tracking-tight text-[var(--color-light-80)] italic">
+            <Link href="/musix" className="hover:underline">
             {albumInfo.albumName.toLowerCase()}
+            </Link>
           </p>
         )}
       </div>

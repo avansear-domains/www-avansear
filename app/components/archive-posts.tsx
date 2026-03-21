@@ -18,7 +18,7 @@ export function ArchivePosts() {
         .map((post) => (
           <Link
             key={post.slug}
-            className="flex flex-col space-y-1 mb-4"
+            className="page-link flex flex-col space-y-1 mb-4"
             href={`/archive/${post.slug}`}
           >
             <div className="w-full flex flex-row space-x-2">

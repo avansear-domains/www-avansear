@@ -18,7 +18,7 @@ export function BlogPosts() {
         .map((post) => (
           <Link
             key={post.slug}
-            className="flex flex-col space-y-1 mb-4"
+            className="page-link flex flex-col space-y-1 mb-4"
             href={`/writings/${post.slug}`}
           >
             <div className="w-full flex flex-row space-x-2">
