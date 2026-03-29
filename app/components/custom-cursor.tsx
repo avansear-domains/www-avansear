@@ -252,7 +252,7 @@ export function CustomCursor() {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-50"
+      className="fixed top-0 left-0 pointer-events-none z-[70]"
       style={{
         willChange: 'transform, opacity'
       }}

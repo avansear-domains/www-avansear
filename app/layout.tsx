@@ -4,10 +4,9 @@ import '../styles/variables.css'
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import { Navbar } from './components/nav'
+import { SiteChrome } from './components/site-chrome'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import Footer from './components/footer'
 import { CustomCursor } from './components/custom-cursor'
 import { CursorProvider } from './components/cursor-context'
 import { CursorHint } from './components/cursor-hint'
@@ -120,13 +119,11 @@ export default function RootLayout({
         <CursorProvider>
           <CustomCursor />
           <CursorHint />
-          <main className="flex-auto min-w-0 mt-8 flex flex-col px-4">
-            <Navbar />
+          <SiteChrome>
             {children}
-            <Footer />
             <Analytics />
             <SpeedInsights />
-          </main>
+          </SiteChrome>
         </CursorProvider>
       </body>
     </html>

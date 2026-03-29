@@ -1,14 +1,13 @@
-import { AnimatedHeading } from '../components/animated-heading'
+import { Navbar } from '../components/nav'
+import { TravelogueLegend } from '../components/travelogue-legend'
+import { TravelogueMap } from '../components/travelogue-map'
 
 export default function Page() {
-    return (
-      <section>
-        <div className="title-spacing">
-          <AnimatedHeading className="font-semibold text-2xl tracking-tighter">
-            travelogue
-          </AnimatedHeading>
-          <p>coming soon :D</p>
-        </div>
-      </section>
-    )
-  } 
+  return (
+    <div className="relative min-h-[100dvh] w-full">
+      <Navbar variant="floating" />
+      <TravelogueLegend />
+      <TravelogueMap />
+    </div>
+  )
+}

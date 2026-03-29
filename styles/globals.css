@@ -30,12 +30,20 @@
     display: none;
   }
   
+  body.travelogue-fullbleed {
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
   html:not([data-theme]) {
     --color-dark: #0C0C0C;
     --color-light: #eeeeee;
     --color-light-80: color-mix(in srgb, var(--color-light) 80%, transparent);
     --color-light-20: color-mix(in srgb, var(--color-light) 20%, transparent);
     --color-light-05: color-mix(in srgb, var(--color-light) 5%, transparent);
+    /* light = light basemap; dark = dark basemap (travelogue map) */
+    --theme-appearance: light;
   }
 
   /* Custom text selection colors */
