@@ -35,13 +35,20 @@ export function Card({
 }: CardProps) {
   const isArrowRight = variant === 'arrow-right'
   const hasDescription = Boolean(description)
+  const overlayLabel = typeof title === 'string' ? title : 'Open'
 
   return (
-    <Link
-      href={href}
-      className={`group block w-full rounded-xl border border-[var(--color-light)]/80 bg-[var(--color-light)]/5 p-4 transition-colors duration-300 ease-out hover:bg-[var(--color-light)]/20 ${className}`}
+    <div
+      className={`group relative block w-full rounded-xl border border-[var(--color-light)]/80 bg-[var(--color-light)]/5 p-4 transition-colors duration-300 ease-out hover:bg-[var(--color-light)]/20 ${className}`}
     >
-      <div className={`flex justify-between gap-4 ${hasDescription ? 'items-start' : 'items-center'}`}>
+      <Link
+        href={href}
+        className="absolute inset-0 z-0 rounded-xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-[var(--color-dark)] dark:focus-visible:outline-[var(--color-light)]"
+        aria-label={overlayLabel}
+      />
+      <div
+        className={`pointer-events-none relative z-[1] flex justify-between gap-4 ${hasDescription ? 'items-start' : 'items-center'}`}
+      >
         {!isArrowRight && (
           <span
             className="inline-flex h-7 w-7 items-center justify-center rounded-full"
@@ -54,7 +61,7 @@ export function Card({
         <div className={`${isArrowRight ? 'text-left' : 'text-right'} px-1`}>
           <h3 className="font-semibold text-2xl [letter-spacing:-0.08em]">{title}</h3>
           {description && (
-            <p className="mt-1 text-sm text-[var(--color-dark)] dark:text-[var(--color-light)]">
+            <p className="mt-1 text-sm text-[var(--color-dark)] dark:text-[var(--color-light)] [&_a]:pointer-events-auto [&_a]:relative [&_a]:z-[2]">
               {description}
             </p>
           )}
@@ -69,6 +76,6 @@ export function Card({
           </span>
         )}
       </div>
-    </Link>
+    </div>
   )
 }

@@ -20,6 +20,19 @@ export default function Page() {
       />
       <Card
         title="travelogue"
+        description={
+          <>
+            made using{' '}
+            <a
+              href="https://arenarium.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              arenarium maps
+            </a>
+          </>
+        }
         href="/travelogue"
         variant='arrow-right'
         className="mt-4"
