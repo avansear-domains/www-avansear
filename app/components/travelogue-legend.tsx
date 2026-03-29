@@ -1,7 +1,12 @@
+type TravelogueLegendProps = {
+  visitedCount?: number
+  wishesCount?: number
+}
+
 /**
  * Map marker legend — matches floating navbar pill styling (blur, border, rounded-full).
  */
-export function TravelogueLegend() {
+export function TravelogueLegend({ visitedCount = 0, wishesCount = 0 }: TravelogueLegendProps) {
   return (
     <div
       className="pointer-events-none fixed left-0 right-0 top-[4.5rem] z-[59] flex justify-center px-3 sm:top-[4.75rem] sm:px-4"
@@ -15,6 +20,9 @@ export function TravelogueLegend() {
             aria-hidden
           />
           <span className="text-[var(--color-dark)] dark:text-[var(--color-light)]">visited</span>
+          <span className="tabular-nums text-[var(--color-dark)] dark:text-[var(--color-light)]">
+            {visitedCount}
+          </span>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-[var(--color-dark)]/15 bg-[var(--color-light)]/85 px-3 py-1.5 text-xs shadow-sm backdrop-blur-md dark:border-[var(--color-light)]/15 dark:bg-[var(--color-dark)]/85">
           <span
@@ -24,6 +32,9 @@ export function TravelogueLegend() {
             ★
           </span>
           <span className="text-[var(--color-dark)] dark:text-[var(--color-light)]">wishes</span>
+          <span className="tabular-nums text-[var(--color-dark)] dark:text-[var(--color-light)]">
+            {wishesCount}
+          </span>
         </div>
       </div>
     </div>

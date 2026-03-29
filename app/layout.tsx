@@ -5,8 +5,7 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { SiteChrome } from './components/site-chrome'
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
+import { VercelObservability } from './components/vercel-observability'
 import { CustomCursor } from './components/custom-cursor'
 import { CursorProvider } from './components/cursor-context'
 import { CursorHint } from './components/cursor-hint'
@@ -121,8 +120,7 @@ export default function RootLayout({
           <CursorHint />
           <SiteChrome>
             {children}
-            <Analytics />
-            <SpeedInsights />
+            <VercelObservability />
           </SiteChrome>
         </CursorProvider>
       </body>

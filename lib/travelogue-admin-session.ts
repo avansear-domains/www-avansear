@@ -24,8 +24,8 @@ export function verifyTravelogueAdminSessionToken(token: string | undefined): bo
   try {
     const raw = JSON.parse(Buffer.from(token, 'base64url').toString('utf8')) as { body: string; sig: string }
     const expected = signBody(secret, raw.body)
-    const a = Buffer.from(raw.sig)
-    const b = Buffer.from(expected)
+    const a = Uint8Array.from(Buffer.from(raw.sig))
+    const b = Uint8Array.from(Buffer.from(expected))
     if (a.length !== b.length || !timingSafeEqual(a, b)) return false
     const { exp } = JSON.parse(raw.body) as { exp: number }
     return typeof exp === 'number' && exp > Date.now()

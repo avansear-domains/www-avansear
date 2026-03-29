@@ -47,6 +47,41 @@ function patchOmtStyleForOpenFreeMap(style: StyleSpecification): StyleSpecificat
  */
 const MIN_ZOOM_COUNTRY_LABELS = 4
 
+/**
+ * Country outline layers (`boundary_country_*`) only while zoomed out (zoom below country-label threshold).
+ * State outlines (`boundary_state`) from the same zoom as country labels so both appear together.
+ * Hides the stock `boundary_country_z5-` layer so country borders do not persist when zoomed in.
+ */
+function patchBasemapBoundaries(style: StyleSpecification): StyleSpecification {
+  const out = structuredClone(style)
+  const z = MIN_ZOOM_COUNTRY_LABELS
+
+  for (const layer of out.layers) {
+    if (layer.type !== 'line') continue
+    const id = layer.id
+
+    if (id === 'boundary_state') {
+      ;(layer as { minzoom?: number }).minzoom = z
+      continue
+    }
+
+    if (id === 'boundary_country_z0-4') {
+      ;(layer as { maxzoom?: number }).maxzoom = z
+      continue
+    }
+
+    if (id === 'boundary_country_z5-') {
+      if (!layer.layout) {
+        ;(layer as { layout: { visibility: string } }).layout = { visibility: 'none' }
+      } else {
+        Object.assign(layer.layout, { visibility: 'none' })
+      }
+    }
+  }
+
+  return out
+}
+
 function patchBasemapLabels(style: StyleSpecification): StyleSpecification {
   const out = structuredClone(style)
   for (const layer of out.layers) {
@@ -77,7 +112,7 @@ async function loadOpenMapTilesBasemap(appearance: 'light' | 'dark'): Promise<St
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Map style HTTP ${res.status}`)
   const json = (await res.json()) as StyleSpecification
-  return patchBasemapLabels(patchOmtStyleForOpenFreeMap(json))
+  return patchBasemapLabels(patchBasemapBoundaries(patchOmtStyleForOpenFreeMap(json)))
 }
 
 /** Resolved from `--theme-appearance` in theme CSS (light | dark). */
@@ -169,8 +204,14 @@ function getStarMarkerElement(fillHex: string, strokeHex: string): HTMLElement {
   return wrap
 }
 
-function getMarkerGlyphElement(kind: 'visited' | 'wishes', fillHex: string, strokeHex: string): HTMLElement {
-  return kind === 'wishes' ? getStarMarkerElement(fillHex, strokeHex) : getDotMarkerElement(fillHex, strokeHex)
+/**
+ * Visited: dark dot, light ring (unlocked). Wishes: light ★ on dark-filled chrome (locked — visit to “unlock”).
+ */
+function getMarkerGlyphElement(kind: 'visited' | 'wishes', dark: string, light: string): HTMLElement {
+  if (kind === 'wishes') {
+    return getStarMarkerElement(light, dark)
+  }
+  return getDotMarkerElement(dark, light)
 }
 
 function normalizeMarkerType(raw: unknown): 'visited' | 'wishes' {
@@ -185,11 +226,12 @@ function getMarkerPopupElement(markerText: string, lat: number, lng: number, tex
   title.style.fontWeight = '600'
   title.style.whiteSpace = 'pre-wrap'
   title.style.wordBreak = 'break-word'
-  title.style.textTransform = 'none'
+  title.style.textTransform = 'lowercase'
   title.textContent = markerText
   const coords = document.createElement('div')
   coords.style.cssText = 'font-size:12px;opacity:0.75;line-height:1.4;'
-  coords.textContent = `${lat.toFixed(4)}°, ${lng.toFixed(4)}°`
+  /** Display-only (3 dp); pin uses full `lat`/`lng` from the marker row. */
+  coords.textContent = `${lat.toFixed(3)}°, ${lng.toFixed(3)}°`
   el.appendChild(title)
   el.appendChild(coords)
   return el
@@ -223,6 +265,7 @@ function buildMarkersFromRows(rows: TravelogueMarkerApiRow[]): MapMarkerProperti
 
   return rows.map((s) => {
     const kind = normalizeMarkerType(s.marker_type)
+    const isWishes = kind === 'wishes'
     const glyph = getMarkerGlyphElement(kind, dark, light)
     return {
       id: s.id,
@@ -233,7 +276,7 @@ function buildMarkersFromRows(rows: TravelogueMarkerApiRow[]): MapMarkerProperti
         element: glyph,
         dimensions: { width: 28, height: 28, padding: 6 },
         style: {
-          background: light,
+          background: isWishes ? dark : light,
           radius: 999,
           filter: tooltipShadow(appearance),
         },
@@ -247,10 +290,15 @@ function buildMarkersFromRows(rows: TravelogueMarkerApiRow[]): MapMarkerProperti
         },
       },
       popup: {
-        element: getMarkerPopupElement(s.marker_text, s.latitude, s.longitude, dark),
+        element: getMarkerPopupElement(
+          s.marker_text,
+          s.latitude,
+          s.longitude,
+          isWishes ? light : dark,
+        ),
         dimensions: { width: 240, height: 100, padding: 8 },
         style: {
-          background: light,
+          background: isWishes ? dark : light,
           filter: shadowFilter(appearance),
           radius: 12,
         },
@@ -285,9 +333,14 @@ function attachMapResize(map: maplibregl.Map, container: HTMLElement) {
   }
 }
 
+function isArenariumDomainError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e)
+  return /invalid domain/i.test(msg)
+}
+
 export function TravelogueMap() {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [errorKind, setErrorKind] = useState<'init' | 'domain' | null>(null)
 
   useEffect(() => {
     if (!TOKEN) return
@@ -350,9 +403,11 @@ export function TravelogueMap() {
         } catch (e) {
           console.warn('OpenMapTiles basemap fetch failed, using bundled fallback style.', e)
           basemapStyle = patchBasemapLabels(
-            structuredClone(
-              initialAppearance === 'dark' ? MaplibreDarkStyle : MaplibreLightStyle,
-            ) as StyleSpecification,
+            patchBasemapBoundaries(
+              structuredClone(
+                initialAppearance === 'dark' ? MaplibreDarkStyle : MaplibreLightStyle,
+              ) as StyleSpecification,
+            ),
           )
         }
 
@@ -417,7 +472,9 @@ export function TravelogueMap() {
         })
       } catch (e) {
         console.error(e)
-        if (!cancelled) setError('init')
+        if (!cancelled) {
+          setErrorKind(isArenariumDomainError(e) ? 'domain' : 'init')
+        }
         disposeMap()
       }
     }
@@ -445,7 +502,33 @@ export function TravelogueMap() {
     )
   }
 
-  if (error) {
+  if (errorKind === 'domain') {
+    return (
+      <div
+        className="fixed inset-0 z-[10] flex flex-col items-center justify-center gap-3 bg-[var(--color-light)] px-6 text-center text-sm lowercase text-[var(--color-dark)] dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
+        role="alert"
+      >
+        <p>
+          the map token does not allow this site&apos;s domain. open your{' '}
+          <a
+            href="https://arenarium.dev/dashboard"
+            className="underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            arenarium dashboard
+          </a>{' '}
+          and add your production url (e.g.{' '}
+          <code className="font-mono text-[var(--color-dark)] dark:text-[var(--color-light)]">
+            https://your-app.vercel.app
+          </code>
+          ) to the token&apos;s allowed domains, then redeploy.
+        </p>
+      </div>
+    )
+  }
+
+  if (errorKind === 'init') {
     return (
       <div
         className="fixed inset-0 z-[10] flex items-center justify-center bg-[var(--color-light)] px-4 text-center text-sm lowercase text-[var(--color-dark)] dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
