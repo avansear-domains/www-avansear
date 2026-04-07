@@ -248,7 +248,7 @@ type TravelogueMarkerApiRow = {
 
 async function fetchTravelogueMarkerRows(): Promise<TravelogueMarkerApiRow[]> {
   try {
-    const res = await fetch('/api/travelogue/markers')
+    const res = await fetch('/api/travelogue/markers', { cache: 'no-store' })
     if (!res.ok) return []
     const data: unknown = await res.json()
     if (!Array.isArray(data)) return []

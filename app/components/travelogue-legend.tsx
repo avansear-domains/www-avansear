@@ -1,12 +1,18 @@
 type TravelogueLegendProps = {
-  visitedCount?: number
-  wishesCount?: number
+  /** `null` while loading fresh totals from the API. */
+  visitedCount?: number | null
+  wishesCount?: number | null
+}
+
+function countLabel(n: number | null | undefined) {
+  if (n === null) return '—'
+  return String(n ?? 0)
 }
 
 /**
  * Map marker legend — matches floating navbar pill styling (blur, border, rounded-full).
  */
-export function TravelogueLegend({ visitedCount = 0, wishesCount = 0 }: TravelogueLegendProps) {
+export function TravelogueLegend({ visitedCount, wishesCount }: TravelogueLegendProps) {
   return (
     <div
       className="pointer-events-none fixed left-0 right-0 top-[4.5rem] z-[59] flex justify-center px-3 sm:top-[4.75rem] sm:px-4"
@@ -21,7 +27,7 @@ export function TravelogueLegend({ visitedCount = 0, wishesCount = 0 }: Travelog
           />
           <span className="text-[var(--color-dark)] dark:text-[var(--color-light)]">visited</span>
           <span className="tabular-nums text-[var(--color-dark)] dark:text-[var(--color-light)]">
-            {visitedCount}
+            {countLabel(visitedCount)}
           </span>
         </div>
         <div className="flex items-center gap-1.5 rounded-full border border-[var(--color-dark)]/15 bg-[var(--color-light)]/85 px-3 py-1.5 text-xs shadow-sm backdrop-blur-md dark:border-[var(--color-light)]/15 dark:bg-[var(--color-dark)]/85">
@@ -33,7 +39,7 @@ export function TravelogueLegend({ visitedCount = 0, wishesCount = 0 }: Travelog
           </span>
           <span className="text-[var(--color-dark)] dark:text-[var(--color-light)]">wishes</span>
           <span className="tabular-nums text-[var(--color-dark)] dark:text-[var(--color-light)]">
-            {wishesCount}
+            {countLabel(wishesCount)}
           </span>
         </div>
       </div>
