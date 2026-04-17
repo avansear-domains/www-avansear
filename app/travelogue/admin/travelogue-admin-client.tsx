@@ -181,7 +181,7 @@ export function TravelogueAdminClient({
               }
             }}
             placeholder="latitude, longitude — e.g. 64.1466, -21.9426"
-            className="normal-case rounded-full border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
+            className="normal-case rounded border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
           />
           <span className="text-xs lowercase text-[var(--color-dark)]/65 dark:text-[var(--color-light)]/65">
             comma separates latitude and longitude. if you fill this, it overrides the fields below.
@@ -199,7 +199,7 @@ export function TravelogueAdminClient({
             value={lat}
             onChange={(e) => setLat(e.target.value)}
             placeholder="e.g. 64.1466"
-            className="normal-case rounded-full border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
+            className="normal-case rounded border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -211,7 +211,7 @@ export function TravelogueAdminClient({
             value={lng}
             onChange={(e) => setLng(e.target.value)}
             placeholder="e.g. -21.9426"
-            className="normal-case rounded-full border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
+            className="normal-case rounded border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
@@ -220,7 +220,7 @@ export function TravelogueAdminClient({
             name="marker_type"
             value={markerType}
             onChange={(e) => setMarkerType(e.target.value === 'wishes' ? 'wishes' : 'visited')}
-            className="normal-case rounded-full border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
+            className="normal-case rounded border border-[var(--color-dark)]/20 bg-[var(--color-light)] px-3 py-2 text-[var(--color-dark)] dark:border-[var(--color-light)]/20 dark:bg-[var(--color-dark)] dark:text-[var(--color-light)]"
           >
             <option value="visited">visited (dot)</option>
             <option value="wishes">wish (star)</option>
