@@ -3,7 +3,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "worker:dev": "bunx wrangler dev --config worker/wrangler.toml",
+    "worker:deploy": "bunx wrangler deploy --config worker/wrangler.toml"
   },
   "dependencies": {
     "@arenarium/maps": "^1.4.7",
@@ -32,6 +34,7 @@
   },
   "devDependencies": {
     "@types/marked": "^6.0.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "wrangler": "^4.86.0"
   }
 }

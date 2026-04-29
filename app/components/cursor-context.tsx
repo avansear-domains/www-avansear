@@ -1,16 +1,31 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 
 interface CursorContextType {
   isCursorEnabled: boolean
+  isCursorAllowed: boolean
   toggleCursor: () => void
 }
 
 const CursorContext = createContext<CursorContextType | undefined>(undefined)
+const CURSOR_DISABLED_PATH_PREFIXES = ['/feed-app']
+
+function isCursorAllowedOnPath(pathname: string | null): boolean {
+  if (!pathname) {
+    return true
+  }
+
+  return !CURSOR_DISABLED_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  )
+}
 
 export function CursorProvider({ children }: { children: ReactNode }) {
   const [isCursorEnabled, setIsCursorEnabled] = useState(true)
+  const pathname = usePathname()
+  const isCursorAllowed = isCursorAllowedOnPath(pathname)
 
   const updateCursorClass = useCallback((enabled: boolean) => {
     if (enabled) {
@@ -24,6 +39,11 @@ export function CursorProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const toggleCursor = useCallback(() => {
+    if (!isCursorAllowed) {
+      updateCursorClass(false)
+      return
+    }
+
     setIsCursorEnabled(prev => {
       const newValue = !prev
       // Save to localStorage
@@ -36,22 +56,9 @@ export function CursorProvider({ children }: { children: ReactNode }) {
       updateCursorClass(newValue)
       return newValue
     })
-  }, [updateCursorClass])
+  }, [isCursorAllowed, updateCursorClass])
 
   useEffect(() => {
-    // Load preference from localStorage on mount
-    try {
-      const savedPreference = localStorage.getItem('customCursorEnabled')
-      if (savedPreference !== null) {
-        const enabled = savedPreference === 'true'
-        setIsCursorEnabled(enabled)
-        updateCursorClass(enabled)
-      }
-    } catch (error) {
-      // localStorage might not be available (e.g., SSR)
-      console.warn('Failed to load cursor preference from localStorage:', error)
-    }
-
     // Add keyboard event listener for Ctrl+Shift+Space
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check for Ctrl+Shift+Space using both code and key for better compatibility
@@ -60,6 +67,9 @@ export function CursorProvider({ children }: { children: ReactNode }) {
         event.shiftKey && 
         (event.code === 'Space' || event.key === ' ' || event.keyCode === 32)
       ) {
+        if (!isCursorAllowed) {
+          return
+        }
         event.preventDefault()
         event.stopPropagation()
         toggleCursor()
@@ -72,10 +82,27 @@ export function CursorProvider({ children }: { children: ReactNode }) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true)
     }
-  }, [toggleCursor, updateCursorClass])
+  }, [isCursorAllowed, toggleCursor])
+
+  useEffect(() => {
+    if (!isCursorAllowed) {
+      setIsCursorEnabled(false)
+      updateCursorClass(false)
+      return
+    }
+
+    try {
+      const savedPreference = localStorage.getItem('customCursorEnabled')
+      const enabled = savedPreference === null ? true : savedPreference === 'true'
+      setIsCursorEnabled(enabled)
+      updateCursorClass(enabled)
+    } catch {
+      updateCursorClass(true)
+    }
+  }, [isCursorAllowed, updateCursorClass])
 
   return (
-    <CursorContext.Provider value={{ isCursorEnabled, toggleCursor }}>
+    <CursorContext.Provider value={{ isCursorEnabled, isCursorAllowed, toggleCursor }}>
       {children}
     </CursorContext.Provider>
   )

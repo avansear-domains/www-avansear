@@ -1,0 +1,107 @@
+.root {
+  min-height: 100dvh;
+  background: #000;
+  color: #f4f4f4;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.emptyState {
+  width: min(640px, 100%);
+  border: 1px solid #222;
+  border-radius: 16px;
+  background: #0c0c0c;
+  padding: 1rem 1.1rem;
+}
+
+.emptyState h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.emptyState p {
+  margin-top: 0.5rem;
+  color: #b8b8b8;
+}
+
+.viewport {
+  background: #000;
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+
+.slide {
+  min-height: 100dvh;
+  width: 100vw;
+  padding: max(1.1rem, env(safe-area-inset-top)) 1rem max(1.1rem, env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  scroll-snap-align: start;
+  background: #000;
+}
+
+.card {
+  width: min(720px, 100%);
+  border: 1px solid #242424;
+  border-radius: 16px;
+  padding: 1rem;
+  background: #0a0a0a;
+}
+
+.meta {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: #8f8f8f;
+}
+
+.title {
+  margin: 0.45rem 0 0;
+  font-size: clamp(1.5rem, 4.8vw, 2.6rem);
+  line-height: 1.1;
+}
+
+.body {
+  margin: 0.7rem 0 0;
+  color: #c9c9c9;
+  line-height: 1.55;
+}
+
+.media {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 0.85rem;
+  border: 1px solid #1f1f1f;
+  object-fit: cover;
+  max-height: 72dvh;
+}
+
+.audio {
+  width: 100%;
+  margin-top: 0.8rem;
+}
+
+.link {
+  margin-top: 0.95rem;
+  display: inline-block;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.deleteButton {
+  margin-top: 0.85rem;
+  display: inline-block;
+  border: 1px solid #3a3a3a;
+  background: #111;
+  color: #f1b3b3;
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+}
+
+.deleteButton:disabled {
+  opacity: 0.6;
+}

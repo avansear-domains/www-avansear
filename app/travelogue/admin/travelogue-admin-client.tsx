@@ -119,7 +119,7 @@ export function TravelogueAdminClient({
   if (!mapPassConfigured) {
     return (
       <p className="text-sm lowercase text-[var(--color-dark)]/80 dark:text-[var(--color-light)]/80">
-        set <code className="font-mono">MAP_PASS</code> in the server environment to use this page.
+        set <code className="font-mono">CUSTOM_PASS</code> in the server environment to use this page.
       </p>
     )
   }

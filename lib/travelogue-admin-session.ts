@@ -10,7 +10,7 @@ function signBody(secret: string, body: string): string {
 
 /** Build a signed session token (store in httpOnly cookie). */
 export function createTravelogueAdminSessionToken(): string | null {
-  const secret = process.env.MAP_PASS
+  const secret = process.env.CUSTOM_PASS
   if (!secret) return null
   const exp = Date.now() + SESSION_MAX_MS
   const body = JSON.stringify({ exp })
@@ -19,7 +19,7 @@ export function createTravelogueAdminSessionToken(): string | null {
 }
 
 export function verifyTravelogueAdminSessionToken(token: string | undefined): boolean {
-  const secret = process.env.MAP_PASS
+  const secret = process.env.CUSTOM_PASS
   if (!secret || !token) return false
   try {
     const raw = JSON.parse(Buffer.from(token, 'base64url').toString('utf8')) as { body: string; sig: string }

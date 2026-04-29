@@ -10,7 +10,7 @@ export default async function WritingsAdminPage() {
   const cookieStore = await cookies()
   const token = cookieStore.get(WRITINGS_ADMIN_COOKIE)?.value
   const initialAuthenticated = verifyWritingsAdminSessionToken(token)
-  const writingsPassConfigured = Boolean(process.env.WRITINGS_PASS)
+  const writingsPassConfigured = Boolean(process.env.CUSTOM_PASS)
   const githubConfigured = Boolean(process.env.GITHUB_TOKEN) && Boolean(process.env.GITHUB_REPO)
 
   return (

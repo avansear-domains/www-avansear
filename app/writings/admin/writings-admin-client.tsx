@@ -112,7 +112,7 @@ export function WritingsAdminClient({ initialAuthenticated, writingsPassConfigur
   if (!writingsPassConfigured) {
     return (
       <p className="mt-6 text-sm lowercase text-[var(--color-dark)]/80 dark:text-[var(--color-light)]/80">
-        set <code className="font-mono">WRITINGS_PASS</code> in the server environment to use this page.
+        set <code className="font-mono">CUSTOM_PASS</code> in the server environment to use this page.
       </p>
     )
   }

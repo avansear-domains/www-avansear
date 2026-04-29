@@ -1,18 +1,22 @@
-import { createHash, timingSafeEqual } from 'crypto'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { createTravelogueAdminSessionToken, TRAVELOGUE_ADMIN_COOKIE } from 'lib/travelogue-admin-session'
 
 function passwordsEqual(a: string, b: string): boolean {
-  const ha = createHash('sha256').update(a, 'utf8').digest()
-  const hb = createHash('sha256').update(b, 'utf8').digest()
-  return ha.length === hb.length && timingSafeEqual(ha, hb)
+  if (a.length !== b.length) return false
+
+  let diff = 0
+  for (let i = 0; i < a.length; i += 1) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  }
+
+  return diff === 0
 }
 
 export async function POST(request: Request) {
-  const expected = process.env.MAP_PASS
+  const expected = process.env.CUSTOM_PASS
   if (!expected) {
-    return NextResponse.json({ ok: false, error: 'server is not configured (MAP_PASS).' }, { status: 503 })
+    return NextResponse.json({ ok: false, error: 'server is not configured (CUSTOM_PASS).' }, { status: 503 })
   }
 
   let body: { password?: string }

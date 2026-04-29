@@ -3,7 +3,11 @@
 import { useCursor } from './cursor-context'
 
 export function CursorHint() {
-  const { isCursorEnabled } = useCursor()
+  const { isCursorEnabled, isCursorAllowed } = useCursor()
+
+  if (!isCursorAllowed) {
+    return null
+  }
 
   return (
     <div className="hidden md:block fixed bottom-4 right-4 z-40 font-mono text-xs text-[var(--color-dark)]">

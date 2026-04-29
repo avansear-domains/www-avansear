@@ -10,7 +10,7 @@ export default async function TravelogueAdminPage() {
   const cookieStore = await cookies()
   const token = cookieStore.get(TRAVELOGUE_ADMIN_COOKIE)?.value
   const initialAuthenticated = verifyTravelogueAdminSessionToken(token)
-  const mapPassConfigured = Boolean(process.env.MAP_PASS)
+  const mapPassConfigured = Boolean(process.env.CUSTOM_PASS)
   const supabaseServiceConfigured = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY)
 
   return (
@@ -21,7 +21,7 @@ export default async function TravelogueAdminPage() {
           travelogue admin
         </AnimatedHeading>
         <p className="text-[var(--color-dark)] lowercase dark:text-[var(--color-light)]">
-          add pins that appear on the public travelogue map. sign in with <code className="font-mono">MAP_PASS</code>.
+          add pins that appear on the public travelogue map. sign in with <code className="font-mono">CUSTOM_PASS</code>.
         </p>
       </div>
       <TravelogueAdminClient

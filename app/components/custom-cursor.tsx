@@ -22,7 +22,7 @@ function ArrowIcon() {
 }
 
 export function CustomCursor() {
-  const { isCursorEnabled } = useCursor()
+  const { isCursorEnabled, isCursorAllowed } = useCursor()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isVisible, setIsVisible] = useState(true) // Start visible for Safari
   const [isHovering, setIsHovering] = useState(false)
@@ -72,7 +72,7 @@ export function CustomCursor() {
     window.addEventListener('resize', checkScreenSize, { passive: true })
     
     // Only add mouse listeners if desktop and cursor is enabled
-    if (isDesktop && isCursorEnabled) {
+    if (isCursorAllowed && isDesktop && isCursorEnabled) {
       // Ensure document covers full viewport for cursor hiding
       document.documentElement.style.setProperty('min-height', '100vh', 'important')
       document.body.style.setProperty('min-height', '100vh', 'important')
@@ -111,7 +111,7 @@ export function CustomCursor() {
     }
 
     // Ensure document/viewport always hides cursor
-    if (isDesktop && isCursorEnabled) {
+    if (isCursorAllowed && isDesktop && isCursorEnabled) {
       // Apply to document element and ensure it covers full viewport
       // But allow it to grow with content (don't set height, only min-height)
       document.documentElement.style.setProperty('cursor', 'none', 'important')
@@ -125,7 +125,7 @@ export function CustomCursor() {
     }
     
     // Browser-specific cursor hiding optimizations (only on desktop and when enabled)
-    if (isDesktop && isCursorEnabled && isFirefox) {
+    if (isCursorAllowed && isDesktop && isCursorEnabled && isFirefox) {
       // More aggressive Firefox cursor hiding
       document.body.style.cursor = 'none'
       document.documentElement.style.cursor = 'none'
@@ -161,7 +161,12 @@ export function CustomCursor() {
       ;(window as any).firefoxCursorInterval = firefoxCursorCheck
     }
     
-    if (isDesktop && isCursorEnabled && (isSafari || isWebKit)) {
+    if (
+      isCursorAllowed &&
+      isDesktop &&
+      isCursorEnabled &&
+      (isSafari || isWebKit)
+    ) {
       // Safari sometimes needs additional cursor hiding
       document.body.style.cursor = 'none'
       document.documentElement.style.cursor = 'none'
@@ -197,7 +202,7 @@ export function CustomCursor() {
       window.removeEventListener('resize', checkScreenSize)
       
       // Remove mouse listeners (only if they were added)
-      if (isDesktop) {
+      if (isCursorAllowed && isDesktop) {
         document.removeEventListener('mousemove', updateMousePosition)
         document.removeEventListener('mouseenter', handleMouseEnter)
         document.removeEventListener('mouseleave', handleMouseLeave)
@@ -239,14 +244,21 @@ export function CustomCursor() {
         document.body.removeAttribute('data-custom-cursor-style')
       }
     }
-  }, [updateMousePosition, handleMouseOver, checkScreenSize, isDesktop, isCursorEnabled])
+  }, [
+    updateMousePosition,
+    handleMouseOver,
+    checkScreenSize,
+    isDesktop,
+    isCursorEnabled,
+    isCursorAllowed,
+  ])
 
   // Calculate position with offset for hover state
   const offsetX = isHovering ? 6 : 4
   const offsetY = isHovering ? 6 : 4
 
   // Don't render until mounted (helps with Safari) or on mobile/small screens or when disabled
-  if (!isMounted || !isDesktop || !isCursorEnabled) {
+  if (!isCursorAllowed || !isMounted || !isDesktop || !isCursorEnabled) {
     return null
   }
 

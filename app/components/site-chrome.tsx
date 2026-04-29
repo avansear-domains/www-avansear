@@ -8,23 +8,30 @@ import Footer from './footer'
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isTravelogue = pathname === '/travelogue'
+  const isFeedApp = pathname === '/feed-app' || pathname.startsWith('/feed-app/')
 
   useEffect(() => {
+    document.documentElement.classList.toggle('feedapp-mode', isFeedApp)
     document.body.classList.toggle('travelogue-fullbleed', isTravelogue)
-    return () => document.body.classList.remove('travelogue-fullbleed')
-  }, [isTravelogue])
+    document.body.classList.toggle('feedapp-fullbleed', isFeedApp)
+    return () => {
+      document.documentElement.classList.remove('feedapp-mode')
+      document.body.classList.remove('travelogue-fullbleed')
+      document.body.classList.remove('feedapp-fullbleed')
+    }
+  }, [isTravelogue, isFeedApp])
 
   return (
     <main
       className={
-        isTravelogue
+        isTravelogue || isFeedApp
           ? 'flex-auto min-h-0 w-full max-w-none flex flex-col !mt-0 !px-0'
           : 'mt-8 flex min-w-0 flex-auto flex-col px-4'
       }
     >
-      {!isTravelogue && <Navbar />}
+      {!isTravelogue && !isFeedApp && <Navbar />}
       {children}
-      {!isTravelogue && <Footer />}
+      {!isTravelogue && !isFeedApp && <Footer />}
     </main>
   )
 }

@@ -1,22 +1,21 @@
+import { createHash, timingSafeEqual } from 'crypto'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { createWritingsAdminSessionToken, WRITINGS_ADMIN_COOKIE } from 'lib/writings-admin-session'
+import { createFeedAdminSessionToken, FEED_ADMIN_COOKIE } from 'lib/feed-admin-session'
 
 function passwordsEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false
-
-  let diff = 0
-  for (let i = 0; i < a.length; i += 1) {
-    diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
-  }
-
-  return diff === 0
+  const ha = createHash('sha256').update(a, 'utf8').digest()
+  const hb = createHash('sha256').update(b, 'utf8').digest()
+  return ha.length === hb.length && timingSafeEqual(ha, hb)
 }
 
 export async function POST(request: Request) {
   const expected = process.env.CUSTOM_PASS
   if (!expected) {
-    return NextResponse.json({ ok: false, error: 'server is not configured (CUSTOM_PASS).' }, { status: 503 })
+    return NextResponse.json(
+      { ok: false, error: 'server is not configured (CUSTOM_PASS).' },
+      { status: 503 }
+    )
   }
 
   let body: { password?: string }
@@ -31,13 +30,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'incorrect password.' }, { status: 401 })
   }
 
-  const token = createWritingsAdminSessionToken()
+  const token = createFeedAdminSessionToken()
   if (!token) {
     return NextResponse.json({ ok: false, error: 'could not create session.' }, { status: 500 })
   }
 
   const cookieStore = await cookies()
-  cookieStore.set(WRITINGS_ADMIN_COOKIE, token, {
+  cookieStore.set(FEED_ADMIN_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
