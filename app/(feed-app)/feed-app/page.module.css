@@ -105,3 +105,17 @@
 .deleteButton:disabled {
   opacity: 0.6;
 }
+
+.deleteMessage {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  background: #111;
+  border: 1px solid #2f2f2f;
+  border-radius: 999px;
+  color: #ddd;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+  z-index: 20;
+}

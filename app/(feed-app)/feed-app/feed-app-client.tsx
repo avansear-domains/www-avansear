@@ -28,12 +28,35 @@ function renderMedia(item: FeedItem) {
 export function FeedAppClient({ items, canManage }: FeedAppClientProps) {
   const [feedItems, setFeedItems] = useState(items)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [canDelete, setCanDelete] = useState(canManage)
+  const [deleteMessage, setDeleteMessage] = useState('')
   const viewportRef = useRef<HTMLDivElement>(null)
   const hasItems = feedItems.length > 0
   const repeated = useMemo(
     () => (hasItems ? [...feedItems, ...feedItems, ...feedItems] : []),
     [feedItems, hasItems]
   )
+
+  useEffect(() => {
+    if (canManage) {
+      setCanDelete(true)
+      try {
+        window.localStorage.setItem('feed-admin-unlocked', 'true')
+      } catch {
+        // Ignore storage errors.
+      }
+      return
+    }
+
+    try {
+      const cached = window.localStorage.getItem('feed-admin-unlocked')
+      if (cached === 'true') {
+        setCanDelete(true)
+      }
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [canManage])
 
   useEffect(() => {
     if (!hasItems || !viewportRef.current) return
@@ -54,8 +77,41 @@ export function FeedAppClient({ items, canManage }: FeedAppClientProps) {
     return () => viewport.removeEventListener('scroll', onScroll)
   }, [feedItems.length, hasItems])
 
+  async function ensureDeleteAccess(): Promise<boolean> {
+    if (canDelete) return true
+
+    const password = window.prompt('Enter CUSTOM_PASS to enable delete:')
+    if (!password) {
+      return false
+    }
+
+    setDeleteMessage('')
+    const response = await fetch('/api/feed/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
+    const data = (await response.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+    if (!response.ok || !data.ok) {
+      setDeleteMessage(data.error || 'auth failed')
+      return false
+    }
+
+    setCanDelete(true)
+    setDeleteMessage('delete unlocked for this browser session.')
+    try {
+      window.localStorage.setItem('feed-admin-unlocked', 'true')
+    } catch {
+      // Ignore storage errors.
+    }
+    return true
+  }
+
   async function handleDelete(id: string) {
-    if (!canManage || deletingId) return
+    if (deletingId) return
+    const ok = await ensureDeleteAccess()
+    if (!ok) return
+
     setDeletingId(id)
     try {
       const response = await fetch('/api/feed/items', {
@@ -65,6 +121,15 @@ export function FeedAppClient({ items, canManage }: FeedAppClientProps) {
       })
       const data = (await response.json().catch(() => ({}))) as { ok?: boolean }
       if (!response.ok || !data.ok) {
+        if (response.status === 401) {
+          setCanDelete(false)
+          try {
+            window.localStorage.removeItem('feed-admin-unlocked')
+          } catch {
+            // Ignore storage errors.
+          }
+          setDeleteMessage('session expired. enter CUSTOM_PASS again to delete.')
+        }
         return
       }
       setFeedItems((prev) => prev.filter((item) => item.id !== id))
@@ -100,19 +165,18 @@ export function FeedAppClient({ items, canManage }: FeedAppClientProps) {
                 open link
               </a>
             ) : null}
-            {canManage ? (
-              <button
-                className={styles.deleteButton}
-                onClick={() => handleDelete(item.id)}
-                disabled={deletingId === item.id}
-                type="button"
-              >
-                {deletingId === item.id ? 'deleting...' : 'delete'}
-              </button>
-            ) : null}
+            <button
+              className={styles.deleteButton}
+              onClick={() => handleDelete(item.id)}
+              disabled={deletingId === item.id}
+              type="button"
+            >
+              {deletingId === item.id ? 'deleting...' : 'delete'}
+            </button>
           </div>
         </article>
       ))}
+      {deleteMessage ? <p className={styles.deleteMessage}>{deleteMessage}</p> : null}
     </div>
   )
 }
