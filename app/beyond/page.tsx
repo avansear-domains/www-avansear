@@ -42,6 +42,7 @@ export default function Page() {
         description="my life in a feed :>"
         href="https://feed.avansear.com"
         variant='arrow-right'
+        className="mt-4"
       />
     </section>
   )
