@@ -36,6 +36,7 @@ export function Card({
   const isArrowRight = variant === 'arrow-right'
   const hasDescription = Boolean(description)
   const overlayLabel = typeof title === 'string' ? title : 'Open'
+  const isExternal = /^https?:\/\//.test(href)
 
   return (
     <div
@@ -45,6 +46,8 @@ export function Card({
         href={href}
         className="absolute inset-0 z-0 rounded-xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-[var(--color-dark)] dark:focus-visible:outline-[var(--color-light)]"
         aria-label={overlayLabel}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noreferrer noopener' : undefined}
       />
       <div
         className={`pointer-events-none relative z-[1] flex justify-between gap-4 ${hasDescription ? 'items-start' : 'items-center'}`}

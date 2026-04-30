@@ -37,6 +37,12 @@ export default function Page() {
         variant='arrow-right'
         className="mt-4"
       />
+      <Card
+        title="ze feed"
+        description="my life in a feed :>"
+        href="https://feed.avansear.com"
+        variant='arrow-right'
+      />
     </section>
   )
 }
